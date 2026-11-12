@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Gobelet avec paille, dans la zone sûre 66x66 centrée -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- paille -->
+    <path android:fillColor="#FFFFFFFF" android:pathData="M60.5,22 L65,23.2 L58.5,60 L54,58.8 Z" />
+    <!-- verre -->
+    <path android:fillColor="#59FFFFFF" android:pathData="M36,38 L72,38 L67,80 Q66.6,83 63.6,83 L44.4,83 Q41.4,83 41,80 Z" />
+    <!-- liquide -->
+    <path android:fillColor="#FFE0218A" android:pathData="M37.6,52 Q42,49.5 46.5,52 T55.5,52 T64.5,52 T70.4,52 L67,80 Q66.6,83 63.6,83 L44.4,83 Q41.4,83 41,80 Z" />
+    <path android:fillColor="#FFFFD5E0" android:pathData="M37.6,52 Q42,49.5 46.5,52 T55.5,52 T64.5,52 T70.4,52 L70,55.5 Q65.5,53.5 61,55.5 T52,55.5 T43,55.5 T38,55 Z" />
+    <!-- contour -->
+    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="2.6" android:strokeLineJoin="round" android:fillColor="#00000000"
+        android:pathData="M36,38 L72,38 L67,80 Q66.6,83 63.6,83 L44.4,83 Q41.4,83 41,80 Z" />
+</vector>

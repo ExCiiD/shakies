@@ -1,0 +1,6 @@
+# Clé de signature de l'APK : ne jamais publier (nécessaire pour les mises à jour de l'app)
+android/shakies-release.jks
+android/keystore.properties
+android/build/
+*.apk
+.claude/

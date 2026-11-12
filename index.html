@@ -1,0 +1,1692 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ff5d73">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Shakies">
+<title>Shakies</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fff8f1; --card:#ffffff; --ink:#2b1d16; --muted:#7a6a60; --line:#f0e2d6;
+  --accent:#ff5d73; --chip:#fff0e4; --shadow:0 8px 24px rgba(120,60,30,.10);
+  --glass:rgba(255,255,255,.22); --glass-stroke:rgba(60,40,30,.35);
+  --nav-h:64px; --top-h:56px;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#1a1412; --card:#251d1a; --ink:#f7ece4; --muted:#b5a49a; --line:#3a2e29;
+    --chip:#33271f; --shadow:0 8px 24px rgba(0,0,0,.35); --glass:rgba(255,255,255,.08); --glass-stroke:rgba(255,255,255,.55); }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font:16px/1.5 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;margin:0;line-height:1.1}
+button{font:inherit;cursor:pointer;color:inherit}
+
+/* ---------- Top bar & bottom nav ---------- */
+.top{position:sticky;top:0;z-index:20;height:calc(var(--top-h) + env(safe-area-inset-top));padding:env(safe-area-inset-top) 16px 0;
+  display:flex;align-items:center;gap:10px;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(12px)}
+.brand{font-family:Fraunces,serif;font-weight:800;font-size:1.15rem;display:flex;align-items:center;gap:8px}
+.brand small{font:500 .7rem Inter,sans-serif;color:var(--muted);display:block;margin-top:-2px}
+.top .back{margin-right:auto;border:0;background:var(--card);box-shadow:var(--shadow);border-radius:999px;padding:8px 14px;font-weight:600;font-size:.9rem}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;justify-content:space-around;
+  height:calc(var(--nav-h) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);
+  background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(14px);border-top:1px solid var(--line)}
+.tabbar button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  font-size:.72rem;font-weight:600;color:var(--muted)}
+.tabbar button span{font-size:1.35rem;line-height:1;transition:transform .2s}
+.tabbar button.on{color:var(--accent)}
+.tabbar button.on span{transform:translateY(-2px) scale(1.12)}
+main{padding:0 16px calc(var(--nav-h) + env(safe-area-inset-bottom) + 20px);max-width:900px;margin:0 auto}
+
+/* ---------- Home ---------- */
+.home{display:flex;gap:10px;min-height:calc(100dvh - var(--top-h) - var(--nav-h) - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 20px)}
+.stage{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;text-align:center;border-radius:28px;padding:14px 14px 18px;position:relative;overflow:hidden;isolation:isolate;justify-content:center}
+.stage::before{content:"";position:absolute;inset:0;background:var(--halo);opacity:.55;z-index:-1;transition:background .6s}
+.kicker{font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-top:4px}
+.cupwrap{margin-top:22px !important;width:min(66vw,290px);flex:0 1 auto;aspect-ratio:240/300;max-height:44vh;min-height:200px;display:grid;place-items:center;margin:4px 0;border:0;background:none;padding:0}
+.cupwrap svg{width:100%;height:100%;overflow:visible}
+.cupwrap.shake{animation:shake .5s}
+@keyframes shake{20%{transform:rotate(-7deg)}45%{transform:rotate(6deg)}70%{transform:rotate(-3deg)}100%{transform:none}}
+.stage h1{font-size:clamp(1.7rem,8vw,2.6rem);margin-top:4px}
+.stage p{margin:6px 0 10px;color:var(--muted);font-size:.95rem;max-width:34ch}
+.badges{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-bottom:14px}
+.badge{font-size:.75rem;font-weight:700;background:var(--card);padding:5px 10px;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.cta{display:flex;gap:10px;width:100%;max-width:360px}
+.btn{flex:1;border:0;border-radius:18px;padding:15px 16px;font-weight:700;background:var(--ink);color:var(--bg);font-size:1rem}
+.btn.alt{flex:0 0 auto;background:var(--card);color:var(--ink);box-shadow:var(--shadow);font-size:1.3rem;padding:12px 18px}
+.btn:active{transform:scale(.96)}
+.hint{font-size:.72rem;color:var(--muted);margin-top:10px}
+
+/* mini sidebar */
+.side{flex:0 0 auto;width:88px;transition:width .3s ease;display:flex;flex-direction:column;background:var(--card);border-radius:22px;
+  box-shadow:var(--shadow);border:1px solid var(--line);overflow:hidden}
+.side.closed{width:30px}
+.side .handle{border:0;background:none;padding:10px 0 6px;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted)}
+.side .handle b{font-size:1rem;transition:transform .3s}
+.side.closed .handle b{transform:rotate(180deg)}
+.side .vlabel{writing-mode:vertical-rl;transform:rotate(180deg);font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.side.closed .list{opacity:0;pointer-events:none}
+.side .list{display:flex;flex-direction:column;gap:12px;padding:4px 8px 12px;overflow-y:auto;transition:opacity .2s;scrollbar-width:none}
+.side .list::-webkit-scrollbar{display:none}
+.mini{border:0;background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.66rem;font-weight:600;line-height:1.15;text-align:center}
+.mini .dot{width:56px;height:56px;border-radius:18px;display:grid;place-items:center;font-size:1.6rem;box-shadow:inset 0 -6px 12px rgba(0,0,0,.08)}
+.mini:active .dot{transform:scale(.92)}
+
+/* ---------- List ---------- */
+.title{display:flex;align-items:baseline;justify-content:space-between;margin:8px 0 12px}
+.title h2{font-size:1.6rem}
+.muted{color:var(--muted)}
+.search{width:100%;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:16px;padding:12px 16px;font:inherit;font-size:16px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:10px 0 4px;margin:0 -16px;padding-left:16px;padding-right:16px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 13px;font-size:.82rem;font-weight:600}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+/* export courses */
+.exleft{display:flex;align-items:center;gap:8px;font-size:.85rem;font-weight:600;margin:4px 0 10px}
+.exleft input{width:18px;height:18px;accent-color:var(--accent)}
+.exgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.exgrid button{border:1px solid var(--line);background:var(--bg);border-radius:14px;padding:11px 6px;font-weight:700;font-size:.82rem}
+.exgrid button:active{transform:scale(.96)}
+.exgrid .exmain{grid-column:1/-1;background:var(--accent);border-color:var(--accent);color:#fff;font-size:1rem;padding:13px}
+.exgrid .exmain small{display:block;font-weight:500;font-size:.72rem;opacity:.9}
+.expre{white-space:pre-wrap;font:500 .78rem/1.45 ui-monospace,Consolas,monospace;background:var(--chip);border-radius:14px;padding:12px;margin:12px 0 0;max-height:220px;overflow:auto}
+.exmsg{font-size:.85rem;font-weight:600;color:var(--accent);margin-top:8px;min-height:1.2em}
+
+/* filtres : une ligne par catégorie, flèches sur petit écran */
+.fpanel{margin-top:6px}
+.frow{margin-top:10px}
+.frow .flabel{margin:0 0 2px}
+.fnote{font-size:.76rem;color:var(--muted);margin:6px 0 0}
+.scroller{position:relative;margin:0 -16px}
+.scroller .chips{position:relative;margin:0;padding:6px 16px 6px;scroll-behavior:smooth;scroll-snap-type:x proximity;scroll-padding-inline:44px}
+.scroller .chip{scroll-snap-align:start}
+.scroller::before,.scroller::after{content:"";position:absolute;top:0;bottom:0;width:56px;z-index:1;pointer-events:none;opacity:0;transition:opacity .2s}
+.scroller::before{left:0;background:linear-gradient(90deg,var(--bg) 35%,transparent)}
+.scroller::after{right:0;background:linear-gradient(270deg,var(--bg) 35%,transparent)}
+.scroller.can-l::before,.scroller.can-r::after{opacity:1}
+.arr{position:absolute;top:50%;transform:translateY(-50%) scale(.8);z-index:2;width:30px;height:30px;border-radius:999px;border:1px solid var(--line);
+  background:var(--card);box-shadow:0 3px 10px rgba(0,0,0,.12);display:grid;place-items:center;font-size:1.15rem;line-height:1;font-weight:700;padding:0 0 2px;
+  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+.arr.l{left:8px}.arr.r{right:8px}
+.scroller.can-l .arr.l,.scroller.can-r .arr.r{opacity:1;pointer-events:auto;transform:translateY(-50%) scale(1)}
+.arr:active{transform:translateY(-50%) scale(.9)}
+@media (min-width:760px){
+  .fpanel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:6px 18px 14px;box-shadow:var(--shadow);margin-top:12px}
+  .frow{display:grid;grid-template-columns:110px 1fr;align-items:start;gap:14px;margin-top:8px}
+  .frow .flabel{margin:0;padding-top:14px}
+  .scroller{margin:0}
+  .scroller .chips{flex-wrap:wrap;overflow:visible;padding:6px 0 0;gap:6px}
+  .scroller::before,.scroller::after,.arr{display:none}
+  .fnote{margin-left:124px}
+}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:10px}
+.card{background:var(--card);border-radius:20px;padding:10px;box-shadow:var(--shadow);border:1px solid var(--line);text-align:left;display:flex;flex-direction:column;gap:6px}
+.card:active{transform:scale(.97)}
+.card .sw{height:86px;border-radius:14px;display:grid;place-items:center;font-size:2.3rem;position:relative}
+.card .sw .tx{position:absolute;right:6px;top:6px;font-size:.85rem;background:rgba(255,255,255,.75);border-radius:999px;padding:1px 6px}
+.card h3{font-size:1rem}
+.card .d{font-size:.78rem;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.empty{padding:40px 10px;text-align:center;color:var(--muted)}
+
+/* ---------- Detail ---------- */
+.dhero{display:flex;align-items:center;gap:12px;border-radius:26px;padding:14px 16px;position:relative;overflow:hidden;isolation:isolate}
+.dhero::before{content:"";position:absolute;inset:0;background:var(--halo);opacity:.55;z-index:-1}
+.dhero .cupwrap{width:120px;flex:none;min-height:0;height:150px;margin:0}
+.dhero h1{font-size:1.7rem}
+.dhero p{margin:4px 0 8px;color:var(--muted);font-size:.9rem}
+.fav{border:0;background:var(--card);border-radius:999px;padding:7px 12px;font-weight:700;font-size:.85rem;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.panel{background:var(--card);border-radius:22px;padding:16px;box-shadow:var(--shadow);border:1px solid var(--line);margin-top:14px}
+.panel h3{font-size:1.15rem;margin-bottom:8px}
+.size{display:flex;background:var(--chip);border-radius:14px;padding:3px;margin-bottom:6px}
+.size button{flex:1;border:0;background:transparent;color:var(--muted);padding:8px;border-radius:11px;font-size:.82rem;font-weight:700}
+.size button.on{background:var(--card);color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.ing{list-style:none;margin:0;padding:0}
+.ing li{display:flex;gap:12px;align-items:center;padding:11px 0;border-bottom:1px dashed var(--line);cursor:pointer;user-select:none}
+.ing li:last-child{border:0}
+.ing .box{width:24px;height:24px;border-radius:8px;border:2px solid var(--line);flex:none;display:grid;place-items:center;font-size:.8rem;color:transparent}
+.ing li.done{opacity:.45;text-decoration:line-through}
+.ing li.done .box{background:var(--accent);border-color:var(--accent);color:#fff}
+.ing .q{font-weight:700;min-width:70px}
+.ing .layer{margin-left:auto;font-size:.68rem;color:var(--muted)}
+.prep{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 12px}
+.prep div{background:var(--chip);border-radius:14px;padding:9px 10px;font-size:.72rem;color:var(--muted)}
+.prep b{display:block;font-size:.9rem;color:var(--ink)}
+.steps{margin:0;padding-left:20px}
+.steps li{margin:7px 0;font-size:.95rem}
+.tip{background:linear-gradient(135deg,#fff3c4,#ffe0e6);color:#2b1d16;border-radius:16px;padding:12px 14px;font-size:.9rem;margin-top:12px}
+
+/* ---------- Shopping ---------- */
+.ctrl{margin:10px 0 4px}
+.ctrl label{display:flex;justify-content:space-between;align-items:baseline;font-weight:600;font-size:.92rem}
+.ctrl label b{font-family:Fraunces,serif;font-size:1.5rem;color:var(--accent)}
+.ctrl input[type=range]{width:100%;accent-color:var(--accent);height:32px}
+.ctrl .scale{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);margin-top:-4px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 4px}
+.stats div{background:var(--chip);border-radius:16px;padding:10px;text-align:center;font-size:.72rem;color:var(--muted)}
+.stats b{display:block;font-family:Fraunces,serif;font-size:1.45rem;color:var(--ink)}
+.warn{background:#fff1d6;color:#7a4b00;border-radius:14px;padding:10px 12px;font-size:.85rem;margin-top:10px}
+.rayon{font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:16px 0 2px}
+.shop li .q{min-width:0;flex:1;font-weight:500}
+.shop li .q small{display:block;color:var(--muted);font-size:.75rem}
+.shop li .p{font-weight:700;font-size:.9rem;white-space:nowrap}
+.menu{display:flex;flex-direction:column;gap:8px}
+.menu button{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--card);border-radius:16px;padding:8px 10px;text-align:left;font-weight:600}
+.menu .dot{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:1.3rem;flex:none}
+.menu .x{margin-left:auto;font-size:.75rem;background:var(--chip);border-radius:999px;padding:2px 8px;color:var(--muted)}
+.row2{display:flex;gap:10px;margin-top:14px}
+.sel{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:7px 10px;max-width:60%}
+.shop li .p{text-align:right}
+.rg{display:block;font-size:.66rem;font-weight:500;color:var(--muted)}
+/* editor */
+.fl{display:block;font-weight:600;font-size:.88rem;margin:8px 0}
+.fl input,.fl textarea,.irow input,.irow select,.tsel{display:block;width:100%;margin-top:4px;font:inherit;font-size:16px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:12px;padding:10px 12px}
+.irow{display:grid;grid-template-columns:62px 84px 1fr 34px;gap:6px;align-items:center;margin-bottom:6px}
+.irow input,.irow select{margin:0;padding:9px 8px}
+.irow button{border:0;background:var(--chip);border-radius:10px;height:38px;color:var(--muted)}
+.tprev{display:flex;gap:14px;align-items:center}
+.tprev .cupwrap{width:110px;height:150px;min-height:0;flex:none;margin:0}
+.auto{font-size:.72rem;color:var(--accent);font-weight:700}
+.dup{border-radius:14px;padding:10px 12px;font-size:.88rem;margin-top:10px}
+.dup.same{background:#ffe1e1;color:#8a1020}
+.dup.near{background:#fff1d6;color:#7a4b00}
+.dup button{border:0;background:rgba(255,255,255,.7);border-radius:999px;padding:3px 10px;font-weight:700;margin-left:4px;color:inherit}
+.err{color:#c1121f;font-weight:600;font-size:.85rem;margin-top:8px}
+.flabel{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-top:12px}
+.picked{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}
+.pchip{border:0;border-radius:999px;padding:7px 12px;font-size:.8rem;font-weight:700;color:#2b1d16}
+.pchip b{opacity:.55;margin-left:2px}
+.pchip.add{background:var(--chip);color:var(--ink);border:1px dashed var(--muted)}
+.picker{margin:10px 0 4px}
+.plist{max-height:300px;overflow-y:auto;margin-top:8px;border:1px solid var(--line);border-radius:16px;padding:4px}
+.prow{width:100%;display:flex;align-items:center;gap:10px;border:0;background:none;padding:6px;border-radius:12px;text-align:left}
+.prow:active{background:var(--chip)}
+.prow .dot{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-size:1.15rem;flex:none}
+.prow .pn{flex:1;font-weight:600;font-size:.9rem;line-height:1.2}
+.prow .pn small{display:block;font-weight:500;color:var(--muted);font-size:.72rem}
+.prow .pc{font-size:.75rem;font-weight:700;color:var(--accent)}
+.prow b{width:30px;height:30px;border-radius:999px;background:var(--accent);color:#fff;display:grid;place-items:center;flex:none}
+
+/* ---------- Cup animations ---------- */
+.w{animation:wave var(--d,4s) linear infinite}
+.w.rev{animation-direction:reverse;animation-duration:calc(var(--d,4s)*1.4)}
+@keyframes wave{to{transform:translateX(100px)}}
+.fill{animation:pour 1.1s cubic-bezier(.2,.8,.2,1)}
+@keyframes pour{from{transform:translateY(190px)}}
+.bub{animation:rise var(--t,3s) ease-in infinite;animation-delay:var(--dl,0s);opacity:0}
+@keyframes rise{0%{transform:translateY(0);opacity:0}15%{opacity:.8}100%{transform:translateY(-150px);opacity:0}}
+.blob{transform-box:fill-box;transform-origin:50% 100%;animation:wob 3.5s ease-in-out infinite;animation-delay:var(--dl,0s)}
+@keyframes wob{50%{transform:scale(1.07,.93)}}
+.ice{transform-box:fill-box;transform-origin:center;animation:bob 3s ease-in-out infinite;animation-delay:var(--dl,0s)}
+@keyframes bob{50%{transform:translateY(5px) rotate(8deg)}}
+.drip{animation:drip var(--t,5s) ease-in infinite;animation-delay:var(--dl,0s)}
+@keyframes drip{0%,55%{transform:translateY(0);opacity:.9}100%{transform:translateY(38px);opacity:0}}
+.tw{animation:tw 2.2s ease-in-out infinite;animation-delay:var(--dl,0s)}
+@keyframes tw{50%{opacity:.15}}
+.foam{transform-box:fill-box;transform-origin:center;animation:foam 4s ease-in-out infinite;animation-delay:var(--dl,0s)}
+@keyframes foam{50%{transform:translateY(-2px) scale(1.1)}}
+/* --- gobelet illustré : animations au repos --- */
+.cupsvg *{transform-box:fill-box}
+.cupsvg .straw{transform-origin:50% 100%;animation:sway 4s ease-in-out infinite}
+@keyframes sway{50%{transform:rotate(2.5deg)}}
+.cupsvg .spark{transform-origin:center;animation:spark 2.4s ease-in-out infinite;animation-delay:var(--dl,0s)}
+@keyframes spark{0%,100%{opacity:1;scale:1}50%{opacity:.35;scale:.6}}
+.cupsvg .tw{animation:tw 2.2s ease-in-out infinite;animation-delay:var(--dl,0s)}
+.cupsvg .ml{opacity:.55}
+.cupsvg .drift{animation:drift 6s ease-in-out infinite alternate;animation-delay:var(--dl,0s)}
+@keyframes drift{to{transform:translate(10px,-6px)}}
+.cupsvg .shard{animation:floaty 3s ease-in-out infinite;animation-delay:var(--dl,0s)}
+@keyframes floaty{50%{transform:translateY(-5px) rotate(12deg)}}
+.cupsvg .chunk{transform-origin:center;animation:bob 3s ease-in-out infinite;animation-delay:var(--dl,0s)}
+.cupsvg .foam{transform-origin:50% 100%;animation:foamy 4s ease-in-out infinite}
+@keyframes foamy{50%{transform:scaleY(1.06)}}
+.cupsvg .scoop{transform-origin:50% 100%;animation:squish 3.2s ease-in-out infinite}
+@keyframes squish{50%{transform:scale(1.025,.98)}}
+.cupsvg .gdrip{transform-origin:50% 0;animation:gdrip 3s ease-in-out infinite}
+@keyframes gdrip{50%{transform:scaleY(1.25)}}
+.cupsvg .gloop{transform-origin:50% 100%;animation:wob 3.5s ease-in-out infinite}
+
+/* --- animations d'arrivée, propres à chaque consistance --- */
+.cupsvg.enter .liq{animation:fillUp var(--fd,1s) var(--fe,cubic-bezier(.2,.8,.2,1)) both}
+@keyframes fillUp{from{transform:translateY(200px)}}
+.cupsvg.enter .ml{animation:mlFlash 1.2s ease-out both}
+@keyframes mlFlash{0%{opacity:0;transform:scale(.6)}30%{opacity:1;transform:scale(1.15)}100%{opacity:.55;transform:none}}
+.cupsvg.enter .cupb{transform-origin:50% 100%}
+/* slushy : remplissage, le gobelet frissonne, la glace pilée jaillit, les éclats volent */
+.cupsvg.t-slushy{--fd:.9s}
+.cupsvg.enter.t-slushy .cupb{animation:shiver .55s .85s linear}
+@keyframes shiver{0%,100%{transform:none}20%{transform:translateX(-3px) rotate(-1deg)}40%{transform:translateX(3px) rotate(1deg)}60%{transform:translateX(-2px)}80%{transform:translateX(2px)}}
+.cupsvg.enter.t-slushy .pop{transform-origin:50% 100%;animation:popIn .55s .75s cubic-bezier(.3,1.7,.5,1) both}
+@keyframes popIn{from{transform:scale(0)}}
+.cupsvg.enter.t-slushy .shard{animation:shardOut .8s .85s cubic-bezier(.2,.8,.3,1) both,floaty 3s 1.7s ease-in-out infinite}
+@keyframes shardOut{from{transform:translate(calc(var(--dx)*-1),calc(var(--dy)*-1)) scale(.2);opacity:0}}
+/* léger : remplissage rapide, les morceaux de fruit plongent */
+.cupsvg.t-leger{--fd:.65s}
+.cupsvg.enter.t-leger .chunk{animation:plop .6s cubic-bezier(.3,1.5,.5,1) both,bob 3s 1.4s ease-in-out infinite;animation-delay:calc(.55s + var(--dl)),1.4s}
+@keyframes plop{from{transform:translateY(-70px);opacity:0}}
+/* crémeux : remplissage lent, la mousse monte, cannelle et vanille tombent */
+.cupsvg.t-cremeux{--fd:1.4s;--fe:ease-in-out}
+.cupsvg.enter.t-cremeux .foam{animation:foamIn .6s 1.2s cubic-bezier(.3,1.5,.5,1) both,foamy 4s 1.8s ease-in-out infinite}
+@keyframes foamIn{from{transform:scaleY(0)}}
+.cupsvg.enter.t-cremeux .drop{animation:fallIn .8s cubic-bezier(.4,0,.3,1.4) both;animation-delay:calc(1.5s + var(--dl))}
+@keyframes fallIn{0%{transform:translateY(-130px) rotate(-25deg);opacity:0}70%{transform:translateY(5px);opacity:1}100%{transform:none}}
+/* glacé : la boule de glace tombe et s'écrase, les coulures s'allongent */
+.cupsvg.t-glace{--fd:.9s}
+.cupsvg.enter.t-glace .scoop{animation:scoopDrop .9s .8s cubic-bezier(.5,0,.4,1) both,squish 3.2s 1.8s ease-in-out infinite}
+@keyframes scoopDrop{0%{transform:translateY(-170px)}55%{transform:translateY(0) scale(1.18,.78)}75%{transform:scale(.94,1.08)}100%{transform:none}}
+.cupsvg.enter.t-glace .gdrip{animation:dripIn .7s 1.5s ease-out both,gdrip 3s 2.2s ease-in-out infinite}
+@keyframes dripIn{from{transform:scaleY(0)}}
+/* épais : remplissage lent et lourd, le gobelet fait « boum », avoine et baies tombent */
+.cupsvg.t-epais{--fd:1.7s;--fe:cubic-bezier(.55,0,.3,1)}
+.cupsvg.enter.t-epais .cupb{animation:thud .6s 1.6s ease-out}
+@keyframes thud{0%,100%{transform:none}35%{transform:scale(1.05,.92)}70%{transform:scale(.98,1.03)}}
+.cupsvg.enter.t-epais .gloop{animation:popIn .5s 1.5s cubic-bezier(.3,1.6,.5,1) both,wob 3.5s 2s ease-in-out infinite}
+.cupsvg.enter.t-epais .popb{transform-origin:center;animation:popIn .45s cubic-bezier(.3,1.8,.5,1) both;animation-delay:calc(1.8s + var(--dl))}
+
+/* --- sélecteur d'univers --- */
+.univ{display:flex;background:var(--card);border-radius:999px;padding:4px;box-shadow:var(--shadow);border:1px solid var(--line);width:100%;max-width:420px}
+.univ button{flex:1;border:0;background:none;border-radius:999px;padding:8px 6px;font-family:Fraunces,serif;font-weight:800;font-size:.98rem;color:var(--muted);white-space:nowrap;transition:background .25s,color .25s}
+.univ button small{font:600 .66rem Inter,sans-serif;margin-left:5px;opacity:.7}
+.univ button.on{background:var(--ink);color:var(--bg)}
+body.u-chef{--accent:#e8590c}
+body.u-chef .univ button.on{background:#e8590c;color:#fff}
+
+/* --- Chef's Kiss : assiette illustrée --- */
+.platewrap{aspect-ratio:240/280}
+.platesvg{overflow:visible}
+.platesvg *{transform-box:fill-box}
+.platesvg .spark{transform-origin:center;animation:spark 2.4s ease-in-out infinite;animation-delay:var(--dl,0s)}
+.platesvg .steam{animation:steam 2.6s ease-in-out infinite;animation-delay:var(--dl,0s);opacity:0}
+@keyframes steam{0%{transform:translateY(10px);opacity:0}30%{opacity:.75}100%{transform:translateY(-22px);opacity:0}}
+.platesvg .lid{transform-origin:50% 100%}
+.platesvg.k-vapeur .lid{animation:lidPuff 4s ease-in-out infinite}
+@keyframes lidPuff{0%,70%,100%{transform:none}80%{transform:translateY(-6px) rotate(-3deg)}90%{transform:translateY(-2px) rotate(1deg)}}
+.platesvg .liqpop{transform-origin:center;animation:simmer 3s ease-in-out infinite}
+@keyframes simmer{50%{transform:scale(1.02,.92)}}
+.platesvg.enter .dish{animation:dishIn .7s cubic-bezier(.3,1.4,.5,1) both;transform-origin:50% 100%}
+@keyframes dishIn{from{transform:translateY(40px) scale(.7);opacity:0}}
+.platesvg.enter .pop{animation:popIn .45s cubic-bezier(.3,1.8,.5,1) both;animation-delay:var(--dl,.9s);transform-origin:center}
+.platesvg.enter.k-assiette .dish{animation:plateSpin .8s cubic-bezier(.3,1.3,.5,1) both;transform-origin:center}
+@keyframes plateSpin{from{transform:rotate(-25deg) scale(.4);opacity:0}}
+.platesvg.enter.k-coupe .slice{animation:fillUp 1.1s .3s cubic-bezier(.2,.8,.2,1) both}
+.platesvg.enter.k-dessert .slice{animation:sliceDrop .8s .2s cubic-bezier(.5,0,.4,1) both;transform-origin:50% 100%}
+@keyframes sliceDrop{0%{transform:translateY(-150px)}60%{transform:translateY(0) scale(1.08,.86)}80%{transform:scale(.97,1.04)}100%{transform:none}}
+.platesvg.enter .cream{animation:popIn .5s 1s cubic-bezier(.3,1.8,.5,1) both;transform-origin:50% 100%}
+.platesvg.enter.k-bocal .lid{animation:lidDrop .7s .5s cubic-bezier(.5,0,.4,1.5) both}
+@keyframes lidDrop{from{transform:translateY(-90px) rotate(-30deg);opacity:0}}
+.platesvg.enter.k-vapeur .lid{animation:lidLift 1.3s .6s ease-in-out both,lidPuff 4s 2s ease-in-out infinite}
+@keyframes lidLift{0%{transform:none}40%{transform:translate(30px,-40px) rotate(14deg)}70%{transform:translate(30px,-40px) rotate(14deg)}100%{transform:none}}
+.platesvg.enter.k-soupe .chop{animation:fallIn .7s .9s cubic-bezier(.4,0,.3,1.4) both}
+.platesvg.enter .chop{animation:fallIn .7s .9s cubic-bezier(.4,0,.3,1.4) both}
+.ksub{font-size:.85rem;color:var(--muted);font-style:italic;margin-top:2px}
+.steps-ck li{align-items:flex-start}
+.steps-ck .box.num{color:var(--muted);font-size:.72rem;font-weight:700}
+.steps-ck li.done .box.num{color:#fff}
+
+@media (prefers-reduced-motion: reduce){ svg *, .cupwrap{animation:none!important} }
+
+@media (min-width:760px){
+  .home{gap:16px}
+  .side{width:120px}
+  .mini .dot{width:70px;height:70px;font-size:2rem}
+  .mini{font-size:.75rem}
+  .cupwrap{width:260px}
+}
+</style>
+</head>
+<body>
+<div class="top" id="top"></div>
+<main id="app"></main>
+<nav class="tabbar">
+  <button data-view="home" class="on"><span>🎲</span>Accueil</button>
+  <button data-view="all"><span>📖</span>Recettes</button>
+  <button data-view="shop"><span>🛒</span>Courses</button>
+  <button data-view="favs"><span>❤️</span>Favoris</button>
+</nav>
+
+<script src="chefskiss-data.js"></script>
+<script src="chefskiss.js"></script>
+<script>
+/* Ordre de remplissage des gobelets :
+   1 fruits/légumes frais → 2 feuilles/herbes → 3 liquides/yaourt → 4 graines/poudres/beurres → 5 glace/surgelés */
+const L = {1:"frais",2:"feuilles",3:"liquide",4:"extras",5:"glacé"};
+/* Textures : leger | cremeux | epais | slushy | glace */
+const TX = {
+  leger:  {label:"Léger",   icon:"💧", A:7,   d:2.4, lvl:80, prog:"BLEND"},
+  cremeux:{label:"Crémeux", icon:"☁️", A:4,   d:4.5, lvl:74, prog:"BLEND"},
+  epais:  {label:"Épais",   icon:"🥄", A:2,   d:9,   lvl:70, prog:"MAX BLEND"},
+  slushy: {label:"Slushy",  icon:"❄️", A:2.5, d:6,   lvl:72, prog:"MAX BLEND"},
+  glace:  {label:"Glacé",   icon:"🧊", A:5,   d:3.2, lvl:84, prog:"BLEND"},
+};
+
+/* Bases liquides : « vegetal » = n'importe quel lait végétal convient ; les autres laits sont imposés par la recette */
+const BASES = {
+  eau:     {icon:"💧", label:"À l'eau"},
+  jus:     {icon:"🧃", label:"Au jus"},
+  lait:    {icon:"🥛", label:"Au lait"},
+  vegetal: {icon:"🌱", label:"Lait végétal (au choix)"},
+  amande:  {icon:"🥜", label:"Lait d'amande"},
+  avoine:  {icon:"🌾", label:"Lait d'avoine"},
+  coco:    {icon:"🥥", label:"Lait de coco"},
+  noisette:{icon:"🌰", label:"Lait de noisette"},
+  soja:    {icon:"🫘", label:"Lait de soja"},
+  riz:     {icon:"🍚", label:"Lait de riz"},
+  yaourt:  {icon:"🥄", label:"Au yaourt"},
+  fruits:  {icon:"🍉", label:"Sans liquide"},
+};
+const BASE_SHORT = {eau:"Eau",jus:"Jus",lait:"Lait",vegetal:"Végétal au choix",amande:"Amande",avoine:"Avoine",coco:"Coco",
+  noisette:"Noisette",soja:"Soja",riz:"Riz",yaourt:"Yaourt",fruits:"Sans liquide"};
+const MILKS = ["lait","vegetal","amande","avoine","coco","noisette","soja","riz"];
+function liquidKind(n){
+  n=n.toLowerCase();
+  if(/végétal/.test(n)) return "vegetal";
+  if(/lait de noisette|boisson noisette/.test(n)) return "noisette";
+  if(/lait de soja|boisson soja/.test(n)) return "soja";
+  if(/lait de riz|boisson riz/.test(n)) return "riz";
+  if(/(lait|boisson) d'amande/.test(n)) return "amande";
+  if(/(lait|boisson) d'avoine/.test(n)) return "avoine";
+  if(/lait de coco|boisson coco/.test(n)) return "coco";
+  if(/^lait/.test(n)) return "lait";
+  if(/^jus/.test(n)) return "jus";
+  if(/^eau|thé|café|limonade/.test(n)) return "eau";
+  if(/yaourt|fromage|petit-suisse|skyr/.test(n)) return "yaourt";
+  return null;
+}
+const baseMemo={};
+function baseOf(r){
+  if(!r.custom && baseMemo[r.id]) return baseMemo[r.id];
+  const vol={};
+  for(const [q,u,n] of r.ing){ const k=liquidKind(n||""); if(k) vol[k]=(vol[k]||0)+(u==="ml"||u==="g"?q:q*50); }
+  let b = MILKS.filter(m=>vol[m]).sort((a,c)=>vol[c]-vol[a])[0];
+  if(!b) b = vol.jus||vol.eau ? ((vol.jus||0)>=(vol.eau||0)?"jus":"eau") : vol.yaourt ? "yaourt" : "fruits";
+  return r.custom ? b : (baseMemo[r.id]=b);
+}
+
+const R = [
+ {id:"tropical",nom:"Tropical Sunrise",emoji:"🥭",c:["#ffd36e","#ff8a5b"],t:"cremeux",tags:["fruité","vitaminé"],desc:"Mangue, ananas et coco : des vacances dans un gobelet.",
+  ing:[[1,"","banane",1],[100,"ml","jus d'orange",3],[100,"ml","lait de coco",3],[1,"c. à c.","jus de citron vert",3],[120,"g","mangue surgelée",5],[80,"g","ananas surgelé",5]],tip:"Ajoute la pulpe d'un fruit de la passion juste avant de servir."},
+ {id:"berry",nom:"Berry Blast",emoji:"🫐",c:["#c8a2ff","#d6336c"],t:"epais",tags:["fruité","antioxydant"],desc:"Le classique fruits rouges, épais et acidulé.",
+  ing:[[0.5,"","banane",1],[150,"ml","lait",3],[100,"g","yaourt grec",3],[1,"c. à s.","miel",4],[150,"g","fruits rouges surgelés",5]],tip:"Pour une version bowl, réduis le lait à 80 ml."},
+ {id:"green",nom:"Green Detox",emoji:"🥬",c:["#c9f5a8","#4fc38a"],t:"leger",tags:["vert","léger"],desc:"Épinards, pomme et concombre. Frais et pas du tout amer.",
+  ing:[[1,"","pomme verte en quartiers",1],[0.25,"","concombre",1],[40,"g","épinards frais",2],[3,"feuilles","menthe",2],[180,"ml","eau de coco",3],[1,"c. à c.","jus de citron",3],[60,"g","ananas surgelé",5]],tip:"Le gingembre frais (1 cm) lui donne un vrai coup de fouet."},
+ {id:"pbj",nom:"Peanut Power",emoji:"🥜",c:["#f3c98b","#a8673a"],t:"epais",tags:["protéiné","post-sport"],desc:"Banane, beurre de cacahuète et cacao : un vrai goûter.",
+  ing:[[1,"","banane mûre",1],[200,"ml","lait",3],[1.5,"c. à s.","beurre de cacahuète",4],[1,"c. à s.","cacao non sucré",4],[30,"g","flocons d'avoine",4],[4,"","glaçons",5]],tip:"Congèle la banane en rondelles la veille pour un effet milkshake."},
+ {id:"fraise-banane",nom:"Fraise Banane",emoji:"🍓",c:["#ffc2c7","#ff6b7a"],t:"cremeux",tags:["fruité","enfants"],desc:"L'indémodable, doux et crémeux.",
+  ing:[[1,"","banane",1],[150,"g","fraises fraîches",1],[150,"ml","lait",3],[80,"g","yaourt nature",3],[1,"c. à c.","sucre vanillé",4],[4,"","glaçons",5]],tip:"Remplace le lait par du jus de pomme pour une version plus fruitée."},
+ {id:"cafe",nom:"Café Frappé Banane",emoji:"☕",c:["#e6c9a8","#8a5a3c"],t:"glace",tags:["énergie","petit-déj"],desc:"Ton café du matin version shakie glacé.",
+  ing:[[120,"ml","café froid",3],[120,"ml","lait d'avoine",3],[1,"c. à s.","beurre d'amande",4],[1,"c. à c.","sirop d'érable",4],[1,"","banane surgelée",5],[3,"","glaçons",5]],tip:"Prépare le café la veille et garde-le au frigo."},
+ {id:"pina",nom:"Piña Colada (sans alcool)",emoji:"🍍",c:["#fff6c2","#ffd166"],t:"slushy",tags:["fruité","été"],desc:"Ananas et coco, ambiance plage.",
+  ing:[[150,"ml","lait de coco",3],[100,"ml","jus d'ananas",3],[1,"c. à s.","noix de coco râpée",4],[180,"g","ananas surgelé",5],[4,"","glaçons",5]],tip:"Une demi-banane rend le tout plus onctueux."},
+ {id:"kiwi",nom:"Kiwi Zen",emoji:"🥝",c:["#d6f5a0","#7bc950"],t:"leger",tags:["vert","vitaminé"],desc:"Kiwi, poire et citron vert : acidulé et rafraîchissant.",
+  ing:[[2,"","kiwis pelés",1],[1,"","poire",1],[30,"g","jeunes pousses d'épinard",2],[150,"ml","eau",3],[1,"c. à c.","jus de citron vert",3],[1,"c. à c.","graines de chia",4],[4,"","glaçons",5]],tip:"Laisse reposer 5 min : le chia épaissit le shakie."},
+ {id:"choco-cerise",nom:"Forêt Noire",emoji:"🍒",c:["#ff9db0","#7a1f3d"],t:"epais",tags:["gourmand","antioxydant"],desc:"Cerise et chocolat, comme le gâteau.",
+  ing:[[0.5,"","banane",1],[200,"ml","lait végétal au choix",3],[1,"c. à s.","cacao",4],[1,"c. à c.","miel",4],[150,"g","cerises dénoyautées surgelées",5]],tip:"Quelques copeaux de chocolat noir dessus, et c'est un dessert."},
+ {id:"carotte",nom:"Carrot Cake",emoji:"🥕",c:["#ffcf99","#ff8c42"],t:"cremeux",tags:["épicé","petit-déj"],desc:"Carotte, cannelle et noix : le gâteau en version liquide.",
+  ing:[[1,"","carotte moyenne en rondelles",1],[1,"","banane",1],[180,"ml","lait",3],[60,"g","yaourt grec",3],[1,"c. à c.","cannelle",4],[10,"g","noix",4],[1,"c. à c.","sirop d'érable",4],[3,"","glaçons",5]],tip:"Utilise MAX BLEND pour bien pulvériser la carotte crue."},
+ {id:"peche",nom:"Pêche Melba",emoji:"🍑",c:["#ffd5b8","#ff9a76"],t:"cremeux",tags:["fruité","été"],desc:"Pêche et framboise, doux et parfumé.",
+  ing:[[150,"ml","lait",3],[80,"g","yaourt vanille",3],[150,"g","pêches surgelées",5],[60,"g","framboises surgelées",5]],tip:"Une pincée de vanille en poudre sublime la pêche."},
+ {id:"matcha",nom:"Matcha Coco",emoji:"🍵",c:["#dff2c8","#8db96a"],t:"glace",tags:["vert","énergie"],desc:"Thé matcha, banane et coco : un boost tout en douceur.",
+  ing:[[1,"","banane",1],[30,"g","épinards",2],[200,"ml","lait de coco (boisson)",3],[1,"c. à c.","matcha",4],[1,"c. à c.","miel",4],[5,"","glaçons",5]],tip:"Le matcha contient de la caféine : plutôt le matin !"},
+ {id:"pasteque",nom:"Pastèque Menthe",emoji:"🍉",c:["#ffc4c4","#ff4f62"],t:"slushy",tags:["léger","été"],desc:"Ultra désaltérant, presque un granité.",
+  ing:[[300,"g","pastèque sans pépins",1],[5,"feuilles","menthe",2],[1,"c. à c.","jus de citron vert",3],[6,"","glaçons",5]],tip:"Pas besoin de liquide : la pastèque en a assez."},
+ {id:"proteine-vanille",nom:"Vanilla Protein",emoji:"💪",c:["#f9f0d8","#d8b36a"],t:"cremeux",tags:["protéiné","post-sport"],desc:"Après la séance, simple et efficace.",
+  ing:[[250,"ml","lait",3],[100,"g","fromage blanc",3],[1,"dose","protéine vanille",4],[20,"g","flocons d'avoine",4],[1,"","banane surgelée",5],[3,"","glaçons",5]],tip:"Mets la poudre après les liquides pour éviter les grumeaux."},
+ {id:"orange-carotte",nom:"Sunshine ACE",emoji:"🍊",c:["#ffe08a","#ff9f43"],t:"leger",tags:["vitaminé","petit-déj"],desc:"Orange, carotte, citron : la vitamine C du matin.",
+  ing:[[1,"","orange pelée",1],[1,"","carotte",1],[1,"cm","gingembre frais",1],[150,"ml","jus d'orange",3],[1,"c. à c.","jus de citron",3],[100,"g","mangue surgelée",5]],tip:"Retire bien la peau blanche de l'orange, elle est amère."},
+ {id:"avocat",nom:"Avocat Velours",emoji:"🥑",c:["#e4f5cf","#6fae4f"],t:"epais",tags:["vert","gourmand"],desc:"Texture veloutée grâce à l'avocat, goût doux de banane.",
+  ing:[[0.5,"","avocat",1],[1,"","banane",1],[30,"g","épinards",2],[200,"ml","lait végétal au choix",3],[1,"c. à c.","miel",4],[4,"","glaçons",5]],tip:"Un trait de citron vert garde la couleur bien verte."},
+ {id:"myrtille-avoine",nom:"Overnight Myrtille",emoji:"🥣",c:["#c5d0ff","#6a7bd8"],t:"epais",tags:["petit-déj","rassasiant"],desc:"Un vrai petit-déjeuner complet à boire.",
+  ing:[[1,"","banane",1],[200,"ml","lait",3],[60,"g","yaourt",3],[40,"g","flocons d'avoine",4],[1,"c. à c.","graines de lin",4],[100,"g","myrtilles surgelées",5]],tip:"Fais tremper l'avoine dans le lait 10 min avant pour une texture plus lisse."},
+ {id:"framboise-citron",nom:"Lemon Raspberry",emoji:"🍋",c:["#fff6a6","#ff6f91"],t:"slushy",tags:["fruité","léger"],desc:"Acidulé et givré, plein de peps.",
+  ing:[[0.5,"","banane",1],[150,"ml","eau",3],[100,"g","yaourt citron",3],[1,"c. à c.","zeste de citron",4],[150,"g","framboises surgelées",5],[4,"","glaçons",5]],tip:"Un filet de miel si tu le préfères moins acide."},
+ {id:"pomme-tarte",nom:"Tarte aux Pommes",emoji:"🍏",c:["#f7e2b5","#d49a50"],t:"cremeux",tags:["épicé","gourmand"],desc:"Pomme, cannelle, avoine : le goût de la tarte de mamie.",
+  ing:[[1,"","pomme en quartiers",1],[180,"ml","lait",3],[80,"g","yaourt vanille",3],[20,"g","flocons d'avoine",4],[1,"c. à c.","cannelle",4],[1,"c. à c.","sirop d'érable",4],[5,"","glaçons",5]],tip:"Une pincée de muscade et tu y es vraiment."},
+ {id:"figue",nom:"Figue Amande",emoji:"🌰",c:["#e7c6d8","#9c5f86"],t:"cremeux",tags:["gourmand","automne"],desc:"Figues, amandes et miel, saveur d'automne.",
+  ing:[[3,"","figues fraîches",1],[0.5,"","banane",1],[200,"ml","lait d'amande",3],[1,"c. à s.","purée d'amande",4],[1,"c. à c.","miel",4],[4,"","glaçons",5]],tip:"Hors saison, 4 figues sèches trempées 15 min font l'affaire."},
+
+ {id:"vmojito",nom:"Virgin Mojito Givré",emoji:"🌿",c:["#e3ffd1","#7fd88a"],t:"slushy",tags:["léger","été"],desc:"Pomme, citron vert et menthe, façon granité.",
+  ing:[[1,"","pomme verte",1],[8,"feuilles","menthe",2],[150,"ml","eau",3],[2,"c. à s.","jus de citron vert",3],[1,"c. à c.","sirop d'agave",4],[10,"","glaçons",5]],tip:"Sers avec une feuille de menthe et une rondelle de citron vert."},
+ {id:"granite-fraise",nom:"Granité Fraise Basilic",emoji:"🍓",c:["#ffd0d6","#ff4d6d"],t:"slushy",tags:["fruité","été"],desc:"Fraise et basilic, croquant de glace.",
+  ing:[[4,"feuilles","basilic",2],[100,"ml","eau",3],[1,"c. à s.","jus de citron",3],[1,"c. à s.","sucre",4],[200,"g","fraises surgelées",5],[4,"","glaçons",5]],tip:"Fais 3 PULSE au lieu du programme complet pour garder des cristaux."},
+ {id:"limonade-framboise",nom:"Limonade Rose Glacée",emoji:"🍋",c:["#ffe3ec","#ff7aa8"],t:"slushy",tags:["léger","été"],desc:"Une limonade frappée, rose et pétillante de goût.",
+  ing:[[1,"","citron pelé",1],[200,"ml","eau froide",3],[2,"c. à s.","sirop d'agave",4],[80,"g","framboises surgelées",5],[8,"","glaçons",5]],tip:"Filtre au chinois si tu veux zéro pépin."},
+ {id:"the-peche",nom:"Thé Glacé Pêche",emoji:"🍑",c:["#ffe6c7","#f4a261"],t:"glace",tags:["léger","été"],desc:"Le thé glacé maison, en bien plus frais.",
+  ing:[[1,"","pêche fraîche",1],[200,"ml","thé noir infusé et refroidi",3],[1,"c. à c.","miel",4],[6,"","glaçons",5]],tip:"Infuse le thé en double dose : la glace va le diluer."},
+ {id:"lassi",nom:"Mango Lassi",emoji:"🥭",c:["#ffe9a8","#ffb627"],t:"cremeux",tags:["fruité","épicé"],desc:"Le classique indien, yaourt et mangue.",
+  ing:[[150,"g","yaourt nature",3],[100,"ml","lait",3],[1,"pincée","cardamome",4],[1,"c. à c.","miel",4],[180,"g","mangue surgelée",5]],tip:"La cardamome, c'est le secret du lassi."},
+ {id:"acai",nom:"Açaí Bowl",emoji:"🫐",c:["#b18bd6","#4b2a6b"],t:"epais",tags:["antioxydant","petit-déj"],desc:"Ultra épais, à manger à la cuillère.",
+  ing:[[0.5,"","banane",1],[60,"ml","lait végétal au choix",3],[100,"g","purée d'açaí surgelée",5],[80,"g","myrtilles surgelées",5]],tip:"Arrête et racle les bords si ça bloque. Garnis de granola et fruits."},
+ {id:"pitaya",nom:"Pitaya Rose",emoji:"🐉",c:["#ffb3e6","#e0218a"],t:"epais",tags:["fruité","antioxydant"],desc:"Un rose fluo naturel, doux et exotique.",
+  ing:[[1,"","banane",1],[80,"ml","lait de coco",3],[100,"g","pitaya rose surgelée",5],[60,"g","mangue surgelée",5]],tip:"Parfait en bowl avec kiwi et noix de coco."},
+ {id:"choco-banane",nom:"Choco Banane Avoine",emoji:"🍫",c:["#d9b38c","#5c3a21"],t:"epais",tags:["gourmand","petit-déj"],desc:"Le goûter chocolat qui cale jusqu'au soir.",
+  ing:[[180,"ml","lait",3],[1,"c. à s.","cacao",4],[30,"g","flocons d'avoine",4],[1,"c. à c.","sirop d'érable",4],[1.5,"","banane surgelée",5]],tip:"Ajoute une pincée de sel : le chocolat ressort mieux."},
+ {id:"golden",nom:"Golden Mango",emoji:"✨",c:["#fff1a8","#f9a825"],t:"cremeux",tags:["épicé","vitaminé"],desc:"Curcuma, gingembre et mangue, tout doré.",
+  ing:[[1,"cm","gingembre frais",1],[200,"ml","lait de coco (boisson)",3],[0.5,"c. à c.","curcuma",4],[1,"pincée","poivre noir",4],[1,"c. à c.","miel",4],[150,"g","mangue surgelée",5]],tip:"Le poivre aide l'absorption du curcuma."},
+ {id:"betterave",nom:"Betterave Boost",emoji:"🍎",c:["#ff9fb2","#9d0b45"],t:"leger",tags:["antioxydant","post-sport"],desc:"Betterave, pomme et framboise, couleur rubis.",
+  ing:[[1,"","petite betterave cuite",1],[1,"","pomme",1],[180,"ml","jus de pomme",3],[1,"c. à c.","jus de citron",3],[80,"g","framboises surgelées",5]],tip:"Les betteraves cuites sous vide sont parfaites ici."},
+ {id:"melon",nom:"Melon Menthe",emoji:"🍈",c:["#fff0c2","#ffb26b"],t:"leger",tags:["léger","été"],desc:"Melon bien mûr et menthe fraîche.",
+  ing:[[300,"g","melon",1],[4,"feuilles","menthe",2],[50,"ml","eau",3],[5,"","glaçons",5]],tip:"Choisis un melon lourd et parfumé."},
+ {id:"ananas-gingembre",nom:"Ananas Gingembre",emoji:"🍍",c:["#fff5b0","#f6c90e"],t:"leger",tags:["vitaminé","léger"],desc:"Piquant, frais et ultra vitaminé.",
+  ing:[[200,"g","ananas frais",1],[2,"cm","gingembre",1],[150,"ml","eau de coco",3],[1,"c. à c.","jus de citron vert",3],[5,"","glaçons",5]],tip:"Retire bien le cœur fibreux de l'ananas."},
+ {id:"pamplemousse",nom:"Pamplemousse Rose",emoji:"🍊",c:["#ffd1c1","#ff6f61"],t:"glace",tags:["léger","vitaminé"],desc:"Acidulé et rafraîchissant, version frappée.",
+  ing:[[1,"","pamplemousse rose pelé",1],[3,"feuilles","menthe",2],[100,"ml","eau",3],[1,"c. à s.","miel",4],[8,"","glaçons",5]],tip:"Pèle à vif pour enlever toute la peau blanche amère."},
+ {id:"cookie",nom:"Cookie Dough",emoji:"🍪",c:["#f1d6a8","#b07d48"],t:"epais",tags:["gourmand","protéiné"],desc:"Le goût de pâte à cookie, sans culpabiliser.",
+  ing:[[200,"ml","lait",3],[1,"c. à s.","beurre de cajou",4],[2,"","dattes dénoyautées",4],[30,"g","flocons d'avoine",4],[1,"c. à s.","pépites de chocolat",4],[1,"","banane surgelée",5]],tip:"Garde quelques pépites pour le dessus."},
+ {id:"tiramisu",nom:"Tiramisu",emoji:"☕",c:["#efe0cc","#7b4b2a"],t:"cremeux",tags:["gourmand","énergie"],desc:"Café, cacao et crème : le dessert italien à boire.",
+  ing:[[0.5,"","banane",1],[100,"ml","café froid",3],[100,"ml","lait",3],[80,"g","fromage blanc",3],[1,"c. à c.","cacao",4],[1,"c. à c.","sucre vanillé",4],[4,"","glaçons",5]],tip:"Saupoudre de cacao au moment de servir."},
+ {id:"snickers",nom:"Snickers Shake",emoji:"🥜",c:["#e0b98a","#6b3e1f"],t:"epais",tags:["gourmand","protéiné"],desc:"Caramel de dattes, cacahuète et chocolat.",
+  ing:[[200,"ml","lait",3],[3,"","dattes Medjool",4],[1,"c. à s.","beurre de cacahuète",4],[1,"c. à s.","cacao",4],[1,"pincée","fleur de sel",4],[1,"","banane surgelée",5]],tip:"Fais tremper les dattes 10 min dans le lait si elles sont sèches."},
+ {id:"pumpkin",nom:"Pumpkin Spice",emoji:"🎃",c:["#ffd09b","#e07a1f"],t:"cremeux",tags:["épicé","automne"],desc:"Potiron et épices, l'automne dans un verre.",
+  ing:[[100,"g","purée de potiron",1],[0.5,"","banane",1],[200,"ml","lait",3],[1,"c. à c.","épices à pain d'épices",4],[1,"c. à s.","sirop d'érable",4],[4,"","glaçons",5]],tip:"La purée de potiron en conserve marche très bien."},
+ {id:"chai",nom:"Chai Banane",emoji:"🫖",c:["#f0dcc0","#a26b3c"],t:"cremeux",tags:["épicé","automne"],desc:"Le thé chai épicé, en shakie réconfortant.",
+  ing:[[1,"","banane",1],[200,"ml","thé chai infusé froid",3],[80,"g","yaourt grec",3],[1,"c. à c.","miel",4],[4,"","glaçons",5]],tip:"Infuse le chai dans du lait chaud la veille, puis refroidis."},
+ {id:"abricot",nom:"Abricot Nectarine",emoji:"🍑",c:["#ffe0a3","#ff9e40"],t:"cremeux",tags:["fruité","été"],desc:"Les fruits d'été à noyau, tout en douceur.",
+  ing:[[3,"","abricots dénoyautés",1],[1,"","nectarine",1],[150,"ml","lait végétal au choix",3],[60,"g","yaourt",3],[5,"","glaçons",5]],tip:"Plus les fruits sont mûrs, moins besoin de sucre."},
+ {id:"raisin",nom:"Raisin Givré",emoji:"🍇",c:["#d7c4ff","#6d3fc0"],t:"slushy",tags:["fruité","enfants"],desc:"Le slushy violet que les enfants adorent.",
+  ing:[[100,"ml","jus de raisin",3],[50,"ml","eau",3],[200,"g","raisins surgelés",5],[3,"","glaçons",5]],tip:"Congèle les grains de raisin à plat sur une plaque."},
+ {id:"cranberry",nom:"Cranberry d'Hiver",emoji:"🍒",c:["#ffc1cc","#b5173b"],t:"leger",tags:["antioxydant","automne"],desc:"Orange et cranberry, acidulé et vif.",
+  ing:[[1,"","orange pelée",1],[150,"ml","jus de cranberry",3],[1,"c. à c.","miel",4],[80,"g","cranberries surgelées",5],[3,"","glaçons",5]],tip:"Ajoute une pincée de cannelle pour un côté Noël."},
+ {id:"clementine",nom:"Granité Clémentine",emoji:"🍊",c:["#ffe0b0","#ff8c1a"],t:"slushy",tags:["vitaminé","enfants"],desc:"Le granité d'hiver plein de vitamines.",
+  ing:[[3,"","clémentines pelées",1],[50,"ml","eau",3],[1,"c. à c.","miel",4],[10,"","glaçons",5]],tip:"Sers tout de suite, avant que la glace ne fonde."},
+ {id:"datte",nom:"Banane Datte Cannelle",emoji:"🌴",c:["#f4dfc0","#9b6a3d"],t:"epais",tags:["rassasiant","petit-déj"],desc:"Naturellement sucré, épais comme un milkshake.",
+  ing:[[220,"ml","lait",3],[3,"","dattes",4],[1,"c. à c.","cannelle",4],[1,"c. à s.","purée d'amande",4],[1.5,"","banane surgelée",5]],tip:"Les dattes Medjool sont les plus moelleuses."},
+ {id:"cassis",nom:"Cassis Vanille",emoji:"🫐",c:["#e0b6f0","#5a1a6e"],t:"cremeux",tags:["antioxydant","fruité"],desc:"Le cassis acidulé adouci par la vanille.",
+  ing:[[0.5,"","banane",1],[150,"ml","lait",3],[100,"g","yaourt vanille",3],[120,"g","cassis surgelé",5]],tip:"Ajoute du miel si ton cassis est très acide."},
+ {id:"mure",nom:"Mûre Pomme",emoji:"🍎",c:["#d9a7c7","#5e1f4d"],t:"cremeux",tags:["fruité","automne"],desc:"Comme une crumble mûre-pomme, en verre.",
+  ing:[[1,"","pomme",1],[150,"ml","jus de pomme",3],[60,"g","yaourt",3],[130,"g","mûres surgelées",5]],tip:"Une cuillère de flocons d'avoine pour le côté crumble."},
+ {id:"green-trop",nom:"Green Tropical",emoji:"🌴",c:["#eafbb0","#5bbf5b"],t:"leger",tags:["vert","vitaminé"],desc:"Tout vert mais goût 100 % tropical.",
+  ing:[[40,"g","épinards",2],[200,"ml","eau de coco",3],[100,"g","ananas surgelé",5],[80,"g","mangue surgelée",5]],tip:"Personne ne sentira les épinards, promis."},
+ {id:"kale",nom:"Kale Power",emoji:"🥬",c:["#cfeec0","#2e8b57"],t:"leger",tags:["vert","léger"],desc:"Le shakie vert costaud, plein de fibres.",
+  ing:[[1,"","pomme",1],[0.5,"","banane",1],[30,"g","chou kale sans tiges",2],[200,"ml","eau",3],[1,"c. à s.","jus de citron",3],[1,"c. à c.","graines de chanvre",4],[4,"","glaçons",5]],tip:"Retire bien les côtes du kale ; MAX BLEND si ça reste filandreux."},
+ {id:"concombre-melon",nom:"Concombre Melon Lime",emoji:"🥒",c:["#e4fbd3","#8fd16a"],t:"glace",tags:["léger","été"],desc:"Le plus rafraîchissant de tous, en pleine canicule.",
+  ing:[[200,"g","melon miel",1],[0.5,"","concombre",1],[100,"ml","eau de coco",3],[1,"c. à s.","jus de citron vert",3],[6,"","glaçons",5]],tip:"Mets le gobelet 10 min au congélateur avant."},
+ {id:"rhubarbe",nom:"Fraise Rhubarbe",emoji:"🍓",c:["#ffd1dc","#e8476b"],t:"cremeux",tags:["fruité","printemps"],desc:"L'acidité de la rhubarbe, la douceur de la fraise.",
+  ing:[[80,"g","compote de rhubarbe",1],[150,"ml","lait",3],[80,"g","yaourt",3],[1,"c. à s.","miel",4],[150,"g","fraises surgelées",5]],tip:"Ne mets jamais de rhubarbe crue : toujours cuite."},
+ {id:"coco-framboise",nom:"Coco Framboise",emoji:"🥥",c:["#ffe4ee","#ff5c8a"],t:"cremeux",tags:["fruité","gourmand"],desc:"Douceur coco et framboise acidulée.",
+  ing:[[0.5,"","banane",1],[200,"ml","lait de coco (boisson)",3],[1,"c. à s.","noix de coco râpée",4],[150,"g","framboises surgelées",5]],tip:"Fais griller la coco râpée à la poêle pour le dessus."},
+ {id:"banana-bread",nom:"Banana Bread",emoji:"🍞",c:["#f3dfb6","#a8743c"],t:"epais",tags:["gourmand","rassasiant"],desc:"Le gâteau à la banane, version shake.",
+  ing:[[200,"ml","lait",3],[30,"g","flocons d'avoine",4],[10,"g","noix de pécan",4],[1,"c. à c.","cannelle",4],[1,"c. à c.","sirop d'érable",4],[1.5,"","banane surgelée",5]],tip:"Plus la banane est tachetée, plus c'est bon."},
+ {id:"cheesecake",nom:"Strawberry Cheesecake",emoji:"🍰",c:["#ffe0e6","#f25c78"],t:"epais",tags:["gourmand","protéiné"],desc:"Fraise, fromage frais et biscuit.",
+  ing:[[150,"ml","lait",3],[100,"g","fromage frais type cream cheese",3],[1,"","biscuit sablé",4],[1,"c. à c.","sucre vanillé",4],[180,"g","fraises surgelées",5]],tip:"Émiette un biscuit sur le dessus pour le croquant."},
+ {id:"mint-choc",nom:"Mint Choc Chip",emoji:"🌱",c:["#d4f5dc","#3fae6a"],t:"epais",tags:["gourmand","vert"],desc:"Menthe-chocolat, comme la glace.",
+  ing:[[30,"g","épinards",2],[6,"feuilles","menthe",2],[180,"ml","lait",3],[1,"c. à s.","pépites de chocolat noir",4],[1.5,"","banane surgelée",5]],tip:"Ajoute les pépites à la fin avec 2 PULSE pour garder des morceaux."},
+ {id:"papaye",nom:"Papaye Lime",emoji:"🧡",c:["#ffd9b0","#ff8243"],t:"leger",tags:["vitaminé","fruité"],desc:"Papaye fondante et citron vert.",
+  ing:[[200,"g","papaye",1],[150,"ml","jus d'orange",3],[1,"c. à s.","jus de citron vert",3],[5,"","glaçons",5]],tip:"Retire bien toutes les graines noires."},
+ {id:"grenade",nom:"Grenade Gingembre",emoji:"🔴",c:["#ffc4cf","#c1121f"],t:"glace",tags:["antioxydant","léger"],desc:"Rubis, piquant et glacé.",
+  ing:[[80,"g","grains de grenade",1],[1,"cm","gingembre",1],[150,"ml","jus de grenade",3],[50,"ml","eau",3],[1,"c. à c.","miel",4],[6,"","glaçons",5]],tip:"Filtre si tu n'aimes pas les petits pépins."},
+ {id:"litchi",nom:"Litchi Rose",emoji:"🌸",c:["#fff0f4","#ffa3c4"],t:"slushy",tags:["fruité","été"],desc:"Litchi, rose et framboise, très parfumé.",
+  ing:[[10,"","litchis pelés",1],[100,"ml","eau de coco",3],[1,"c. à c.","eau de rose",3],[60,"g","framboises surgelées",5],[8,"","glaçons",5]],tip:"Les litchis en conserve marchent aussi (égouttés)."},
+ {id:"mangue-chili",nom:"Mango Chili",emoji:"🌶️",c:["#ffe08a","#ff5e3a"],t:"glace",tags:["épicé","fruité"],desc:"Mangue glacée avec une pointe de piment.",
+  ing:[[150,"ml","jus d'orange",3],[1,"c. à s.","jus de citron vert",3],[1,"pincée","piment d'Espelette",4],[150,"g","mangue surgelée",5],[4,"","glaçons",5]],tip:"Givre le bord du verre avec sel + piment + sucre."},
+ {id:"cerise-amande",nom:"Cerise Amande",emoji:"🍒",c:["#ffc6d0","#a4133c"],t:"cremeux",tags:["fruité","gourmand"],desc:"Le duo cerise-amande façon Bakewell.",
+  ing:[[200,"ml","lait d'amande",3],[60,"g","yaourt",3],[1,"c. à s.","purée d'amande",4],[2,"gouttes","extrait d'amande amère",4],[150,"g","cerises surgelées",5]],tip:"Pas plus de 2 gouttes d'extrait, c'est puissant."},
+ {id:"poire-vanille",nom:"Poire Vanille Épices",emoji:"🍐",c:["#f5f0c8","#c9b458"],t:"cremeux",tags:["épicé","automne"],desc:"Poire fondante, vanille et muscade.",
+  ing:[[1.5,"","poire mûre",1],[180,"ml","lait",3],[60,"g","yaourt vanille",3],[1,"pincée","cannelle",4],[1,"pincée","muscade",4],[4,"","glaçons",5]],tip:"Une poire bien mûre = zéro sucre ajouté."},
+ {id:"kids",nom:"Banane Myrtille Kids",emoji:"🧸",c:["#d6dcff","#6c7ae0"],t:"cremeux",tags:["enfants","fruité"],desc:"Doux, violet et sans sucre ajouté.",
+  ing:[[1,"","banane",1],[200,"ml","lait",3],[60,"g","petit-suisse ou yaourt",3],[100,"g","myrtilles surgelées",5]],tip:"Sers avec une paille rigolote, succès garanti."},
+
+ /* ---- Péi & nouveautés ---- */
+ {id:"letchi-coco",nom:"Letchi Coco Péi",emoji:"🌸",c:["#fff3f0","#f7b2b7"],t:"cremeux",tags:["péi","fruité"],desc:"Letchis de saison et lait de coco, le goût des fêtes à La Réunion.",
+  ing:[[12,"","letchis pelés",1],[150,"ml","lait de coco",3],[50,"ml","eau",3],[1,"c. à c.","jus de citron vert",3],[6,"","glaçons",5]],tip:"Retire bien tous les noyaux, ils abîmeraient la lame."},
+ {id:"passion-mangue",nom:"Mangue Passion",emoji:"🥭",c:["#ffe27a","#ff9f1c"],t:"cremeux",tags:["péi","fruité"],desc:"Mangue et fruit de la passion, acidulé et ensoleillé.",
+  ing:[[2,"","fruits de la passion (pulpe)",1],[150,"ml","jus d'orange",3],[80,"g","yaourt nature",3],[180,"g","mangue surgelée",5]],tip:"Passe la pulpe de passion au tamis si tu n'aimes pas les graines."},
+ {id:"goyavier",nom:"Goyavier Givré",emoji:"🔴",c:["#ffc2c2","#c9184a"],t:"slushy",tags:["péi","antioxydant"],desc:"Le petit fruit rouge des hauts, en granité.",
+  ing:[[150,"g","goyaviers",1],[150,"ml","eau",3],[1,"c. à s.","sirop d'agave",4],[8,"","glaçons",5]],tip:"Filtre au chinois : les goyaviers ont plein de petites graines."},
+ {id:"carambole",nom:"Carambole Ananas",emoji:"⭐",c:["#fff7b0","#e9c46a"],t:"leger",tags:["péi","léger"],desc:"Carambole juteuse et ananas, ultra rafraîchissant.",
+  ing:[[1,"","carambole",1],[150,"g","ananas frais",1],[150,"ml","eau de coco",3],[5,"","glaçons",5]],tip:"Garde une tranche en étoile pour décorer le verre."},
+ {id:"corossol",nom:"Corossol Velours",emoji:"🤍",c:["#fbfbf2","#cfe3bd"],t:"cremeux",tags:["péi","gourmand"],desc:"La chair douce et parfumée du corossol, façon milk-shake.",
+  ing:[[150,"g","pulpe de corossol",1],[150,"ml","lait",3],[1,"c. à c.","sucre vanillé",4],[1,"pincée","muscade",4],[5,"","glaçons",5]],tip:"Retire toutes les graines noires du corossol."},
+ {id:"papaye-passion",nom:"Papaye Passion",emoji:"🧡",c:["#ffd3a5","#fd6f3c"],t:"leger",tags:["péi","vitaminé"],desc:"Papaye fondante relevée au fruit de la passion.",
+  ing:[[200,"g","papaye",1],[2,"","fruits de la passion (pulpe)",1],[150,"ml","jus d'orange",3],[5,"","glaçons",5]],tip:"Une papaye bien orange et souple est parfaite."},
+ {id:"banane-vanille",nom:"Banane Vanille Bourbon",emoji:"🍦",c:["#fff4d6","#e9c46a"],t:"epais",tags:["péi","gourmand"],desc:"Banane et vraie vanille Bourbon, comme une glace.",
+  ing:[[220,"ml","lait",3],[0.25,"","gousse de vanille (grains)",4],[1,"c. à c.","miel",4],[2,"","bananes surgelées",5]],tip:"Gratte les grains de la gousse, garde la gousse pour parfumer du sucre."},
+ {id:"tamarin",nom:"Tamarin Gingembre",emoji:"🟤",c:["#e8c9a0","#8b5a2b"],t:"glace",tags:["péi","épicé"],desc:"Acidulé, sucré et piquant, très désaltérant.",
+  ing:[[1,"cm","gingembre",1],[200,"ml","eau",3],[30,"g","pâte de tamarin",4],[1,"c. à s.","sucre",4],[8,"","glaçons",5]],tip:"Dilue la pâte de tamarin dans un peu d'eau tiède avant."},
+ {id:"victoria-coco",nom:"Victoria Coco Givré",emoji:"🍍",c:["#fff6c4","#f4d35e"],t:"slushy",tags:["péi","été"],desc:"Ananas Victoria et coco en granité.",
+  ing:[[200,"g","ananas frais",1],[100,"ml","lait de coco",3],[1,"c. à c.","jus de citron vert",3],[10,"","glaçons",5]],tip:"L'ananas Victoria est plus sucré : pas besoin de sucre."},
+ {id:"citron-gingembre",nom:"Citron Vert Gingembre Givré",emoji:"🍋",c:["#f1ffd0","#a7d948"],t:"slushy",tags:["péi","léger"],desc:"Une citronnade givrée qui pique un peu.",
+  ing:[[2,"","citrons verts pelés",1],[1,"cm","gingembre",1],[200,"ml","eau",3],[2,"c. à s.","sucre",4],[10,"","glaçons",5]],tip:"Pèle les citrons à vif, la peau donne de l'amertume."},
+ {id:"mangue-letchi",nom:"Mangue Letchi",emoji:"🥭",c:["#fff0c9","#ffb347"],t:"leger",tags:["péi","fruité"],desc:"Les deux stars de l'été austral réunies.",
+  ing:[[8,"","letchis pelés",1],[100,"ml","eau de coco",3],[150,"g","mangue surgelée",5]],tip:"Congèle tes mangues en dés quand c'est la pleine saison."},
+ {id:"bounty",nom:"Bounty Shake",emoji:"🥥",c:["#f5ebe0","#6f4e37"],t:"epais",tags:["gourmand","péi"],desc:"Coco et chocolat, comme la barre.",
+  ing:[[150,"ml","lait de coco",3],[50,"ml","lait",3],[1,"c. à s.","cacao",4],[1,"c. à s.","noix de coco râpée",4],[1.5,"","banane surgelée",5]],tip:"Ajoute la coco râpée sur le dessus pour le croquant."},
+ {id:"fraise-kiwi",nom:"Fraise Kiwi",emoji:"🥝",c:["#ffd6d6","#e85d75"],t:"leger",tags:["fruité","vitaminé"],desc:"Le duo acidulé plein de vitamine C.",
+  ing:[[2,"","kiwis pelés",1],[150,"g","fraises fraîches",1],[150,"ml","jus de pomme",3],[4,"","glaçons",5]],tip:"Ne mixe pas trop longtemps : les graines de kiwi deviennent amères."},
+ {id:"orange-banane",nom:"Orange Banane",emoji:"🍊",c:["#ffe8b0","#ffa94d"],t:"cremeux",tags:["petit-déj","enfants"],desc:"Le classique du matin, simple et efficace.",
+  ing:[[1,"","banane",1],[200,"ml","jus d'orange",3],[60,"g","yaourt nature",3],[4,"","glaçons",5]],tip:"Avec du jus pressé maison c'est encore meilleur."},
+ {id:"raita",nom:"Concombre Menthe Yaourt",emoji:"🥒",c:["#eefbe6","#a3d98b"],t:"cremeux",tags:["léger","vert"],desc:"Façon lassi salé, très frais par temps chaud.",
+  ing:[[0.5,"","concombre",1],[6,"feuilles","menthe",2],[150,"g","yaourt nature",3],[100,"ml","eau",3],[1,"pincée","sel",4],[5,"","glaçons",5]],tip:"Une pincée de cumin le rend encore plus parfumé."},
+ {id:"blue-chia",nom:"Blue Chia",emoji:"🫐",c:["#cdd5ff","#3a4cc0"],t:"epais",tags:["antioxydant","rassasiant"],desc:"Myrtilles et chia, épais et rassasiant.",
+  ing:[[1,"","banane",1],[200,"ml","lait végétal au choix",3],[1,"c. à s.","graines de chia",4],[120,"g","myrtilles surgelées",5]],tip:"Laisse reposer 5 min, il épaissit encore."},
+ {id:"sunset",nom:"Sunset Framboise Mangue",emoji:"🌅",c:["#ffd6a5","#ff5d8f"],t:"cremeux",tags:["fruité","été"],desc:"Mangue et framboise, couleur coucher de soleil.",
+  ing:[[150,"ml","jus d'orange",3],[60,"g","yaourt nature",3],[100,"g","mangue surgelée",5],[80,"g","framboises surgelées",5]],tip:"Verse en deux couches pour un effet dégradé."},
+ {id:"peche-gingembre",nom:"Pêche Gingembre Glacé",emoji:"🍑",c:["#ffe3c4","#f79d65"],t:"glace",tags:["épicé","léger"],desc:"Pêche juteuse et pointe de gingembre.",
+  ing:[[1,"","pêche fraîche",1],[1,"cm","gingembre",1],[150,"ml","eau de coco",3],[1,"c. à c.","miel",4],[6,"","glaçons",5]],tip:"Garde la peau de la pêche, elle donne de la couleur."},
+ {id:"ananas-menthe",nom:"Ananas Menthe Slush",emoji:"🍍",c:["#fbffc7","#c6e05a"],t:"slushy",tags:["léger","été"],desc:"Granité d'ananas à la menthe fraîche.",
+  ing:[[6,"feuilles","menthe",2],[100,"ml","eau",3],[1,"c. à c.","jus de citron vert",3],[200,"g","ananas surgelé",5],[4,"","glaçons",5]],tip:"Sers dans un verre passé au congélateur."},
+ {id:"cerise-coco",nom:"Cerise Coco",emoji:"🍒",c:["#ffd1dc","#b5174a"],t:"cremeux",tags:["fruité","gourmand"],desc:"Cerises et coco, doux et fruité.",
+  ing:[[200,"ml","lait de coco (boisson)",3],[1,"c. à c.","miel",4],[150,"g","cerises surgelées",5],[0.5,"","banane surgelée",5]],tip:"Un peu de cacao en plus et c'est un dessert."},
+ {id:"pbj-fraise",nom:"Peanut Butter Jelly",emoji:"🥪",c:["#ffd0c8","#c0485e"],t:"epais",tags:["protéiné","gourmand"],desc:"Fraise et beurre de cacahuète, le goûter américain.",
+  ing:[[180,"ml","lait",3],[1,"c. à s.","beurre de cacahuète",4],[150,"g","fraises surgelées",5],[0.5,"","banane surgelée",5]],tip:"Une pincée de sel fait ressortir le goût cacahuète."},
+ {id:"proteine-choco",nom:"Chocolate Protein",emoji:"🍫",c:["#e2c8ae","#5c3a21"],t:"cremeux",tags:["protéiné","post-sport"],desc:"Le shake chocolat d'après séance.",
+  ing:[[250,"ml","lait",3],[1,"dose","protéine chocolat",4],[1,"c. à s.","cacao",4],[1,"","banane surgelée",5],[3,"","glaçons",5]],tip:"Mets la poudre après les liquides pour éviter les grumeaux."},
+ {id:"moka",nom:"Moka Avoine",emoji:"☕",c:["#e8d2bb","#6b4226"],t:"epais",tags:["énergie","petit-déj"],desc:"Café, cacao et avoine : petit-déj complet.",
+  ing:[[120,"ml","café froid",3],[120,"ml","lait",3],[30,"g","flocons d'avoine",4],[1,"c. à c.","cacao",4],[1,"","banane surgelée",5]],tip:"Parfait à emporter dans le gobelet avec son couvercle."},
+ {id:"vert-poire",nom:"Vert Poire Gingembre",emoji:"🍐",c:["#e9f7c9","#86c06c"],t:"leger",tags:["vert","léger"],desc:"Poire douce, épinards et gingembre.",
+  ing:[[1,"","poire",1],[1,"cm","gingembre",1],[40,"g","épinards",2],[200,"ml","eau",3],[1,"c. à c.","jus de citron",3],[4,"","glaçons",5]],tip:"Une poire bien mûre masque totalement les épinards."},
+ {id:"abricot-amande",nom:"Abricot Amande",emoji:"🍑",c:["#ffe6b8","#f2994a"],t:"cremeux",tags:["fruité","gourmand"],desc:"Abricot et amande, le duo pâtissier.",
+  ing:[[4,"","abricots dénoyautés",1],[200,"ml","lait d'amande",3],[1,"c. à s.","purée d'amande",4],[1,"c. à c.","miel",4],[5,"","glaçons",5]],tip:"Hors saison, utilise des abricots secs trempés."},
+ {id:"melon-fraise",nom:"Melon Fraise",emoji:"🍈",c:["#ffe9d6","#ff8f7a"],t:"leger",tags:["été","fruité"],desc:"Melon et fraise, l'été en version légère.",
+  ing:[[200,"g","melon",1],[100,"g","fraises fraîches",1],[50,"ml","eau",3],[5,"","glaçons",5]],tip:"Pas de sucre : les fruits suffisent."},
+ {id:"pasteque-fraise",nom:"Pastèque Fraise Slush",emoji:"🍉",c:["#ffd0d0","#ff4060"],t:"slushy",tags:["été","enfants"],desc:"Le slush rouge préféré des enfants.",
+  ing:[[250,"g","pastèque",1],[1,"c. à c.","jus de citron vert",3],[100,"g","fraises surgelées",5],[4,"","glaçons",5]],tip:"Retire les pépins noirs de la pastèque."},
+ {id:"mangue-chia",nom:"Mangue Coco Chia",emoji:"🥭",c:["#fff0b8","#ffb000"],t:"epais",tags:["petit-déj","rassasiant"],desc:"Façon pudding de chia mangue-coco.",
+  ing:[[150,"ml","lait de coco (boisson)",3],[1,"c. à s.","graines de chia",4],[180,"g","mangue surgelée",5],[0.5,"","banane surgelée",5]],tip:"Prépare-le la veille, il sera encore plus épais."},
+ {id:"rouge-avoine",nom:"Fruits Rouges Avoine",emoji:"🍓",c:["#f6c6d4","#b3245a"],t:"epais",tags:["petit-déj","antioxydant"],desc:"Fruits rouges, yaourt et avoine pour bien démarrer.",
+  ing:[[200,"ml","lait",3],[60,"g","yaourt nature",3],[30,"g","flocons d'avoine",4],[1,"c. à c.","miel",4],[150,"g","fruits rouges surgelés",5]],tip:"Ajoute une poignée de granola sur le dessus."},
+ {id:"kiwi-banane",nom:"Kiwi Banane",emoji:"🥝",c:["#eef8c8","#8cc63f"],t:"cremeux",tags:["vitaminé","enfants"],desc:"Doux et un peu acidulé, très vert.",
+  ing:[[2,"","kiwis pelés",1],[1,"","banane",1],[150,"ml","jus de pomme",3],[60,"g","yaourt nature",3],[4,"","glaçons",5]],tip:"Utilise des kiwis bien mûrs, moins acides."},
+ {id:"pomme-carotte",nom:"Pomme Carotte Gingembre",emoji:"🥕",c:["#ffe2b8","#ff8c32"],t:"leger",tags:["vitaminé","léger"],desc:"Le jus vitaminé version shakie.",
+  ing:[[1,"","pomme",1],[1,"","carotte",1],[1,"cm","gingembre",1],[200,"ml","jus de pomme",3],[4,"","glaçons",5]],tip:"MAX BLEND si la carotte reste en morceaux."},
+ {id:"lemon-blue",nom:"Lemon Blueberry",emoji:"🍋",c:["#e6e9ff","#5f6fd6"],t:"cremeux",tags:["fruité","antioxydant"],desc:"Myrtille et zeste de citron, façon muffin.",
+  ing:[[0.5,"","banane",1],[150,"ml","lait",3],[80,"g","yaourt nature",3],[1,"c. à c.","zeste de citron",4],[120,"g","myrtilles surgelées",5]],tip:"Zeste uniquement la partie jaune du citron."},
+ {id:"cranberry-pomme",nom:"Cranberry Pomme Glacé",emoji:"🍎",c:["#ffd0d6","#c9184a"],t:"glace",tags:["léger","automne"],desc:"Acidulé et frais, tout simple.",
+  ing:[[1,"","pomme",1],[150,"ml","jus de cranberry",3],[50,"ml","eau",3],[6,"","glaçons",5]],tip:"Une pomme rouge pour une jolie couleur."},
+ {id:"cafe-coco",nom:"Café Coco Glacé",emoji:"☕",c:["#efe2d0","#7a5236"],t:"glace",tags:["énergie","été"],desc:"Café frappé au lait de coco.",
+  ing:[[150,"ml","café froid",3],[100,"ml","lait de coco",3],[1,"c. à c.","sucre",4],[8,"","glaçons",5]],tip:"Fais des glaçons de café pour ne pas diluer."},
+ {id:"the-mangue",nom:"Thé Glacé Mangue",emoji:"🥭",c:["#fff2c2","#f2b134"],t:"glace",tags:["léger","été"],desc:"Thé vert et mangue, frais et parfumé.",
+  ing:[[200,"ml","thé vert infusé froid",3],[1,"c. à c.","miel",4],[120,"g","mangue surgelée",5],[4,"","glaçons",5]],tip:"N'infuse pas le thé vert plus de 3 min, il devient amer."},
+ {id:"popeye",nom:"Popeye Shake",emoji:"💚",c:["#dff5c8","#4e9a3e"],t:"epais",tags:["vert","protéiné"],desc:"Épinards, banane et cacahuète : de la force !",
+  ing:[[40,"g","épinards",2],[200,"ml","lait",3],[1,"c. à s.","beurre de cacahuète",4],[1.5,"","banane surgelée",5]],tip:"On ne sent pas du tout les épinards, promis."},
+ {id:"dragon-trop",nom:"Dragon Tropical",emoji:"🐉",c:["#ffc6ec","#d0006f"],t:"slushy",tags:["fruité","été"],desc:"Pitaya et ananas givrés, rose fluo.",
+  ing:[[100,"ml","eau de coco",3],[100,"g","pitaya rose surgelée",5],[100,"g","ananas surgelé",5],[3,"","glaçons",5]],tip:"Spectaculaire en verre transparent."},
+ {id:"raisin-pomme",nom:"Raisin Pomme",emoji:"🍇",c:["#e9dcff","#8a5cd6"],t:"leger",tags:["enfants","fruité"],desc:"Doux et fruité, sans sucre ajouté.",
+  ing:[[150,"g","raisin",1],[1,"","pomme",1],[100,"ml","eau",3],[5,"","glaçons",5]],tip:"Du raisin sans pépins, c'est plus simple."},
+ {id:"pain-epices",nom:"Pain d'Épices",emoji:"🎄",c:["#f3dcc0","#a0612b"],t:"cremeux",tags:["épicé","gourmand"],desc:"Miel et épices, l'ambiance de Noël.",
+  ing:[[1,"","banane",1],[200,"ml","lait",3],[1,"c. à c.","épices à pain d'épices",4],[1,"c. à s.","miel",4],[20,"g","flocons d'avoine",4],[4,"","glaçons",5]],tip:"Émiette un morceau de pain d'épices dessus."},
+ {id:"clementine-carotte",nom:"Clémentine Carotte",emoji:"🍊",c:["#ffe4c2","#ff8a1f"],t:"leger",tags:["vitaminé","enfants"],desc:"Orange vif, doux et vitaminé.",
+  ing:[[3,"","clémentines pelées",1],[1,"","carotte",1],[100,"ml","jus d'orange",3],[5,"","glaçons",5]],tip:"Coupe la carotte en rondelles fines."},
+ {id:"cassis-pomme",nom:"Cassis Pomme Slush",emoji:"🫐",c:["#ead0f5","#6a1b7a"],t:"slushy",tags:["antioxydant","enfants"],desc:"Un granité violet acidulé.",
+  ing:[[150,"ml","jus de pomme",3],[120,"g","cassis surgelé",5],[6,"","glaçons",5]],tip:"Un peu de miel si c'est trop acide."},
+ {id:"mure-vanille",nom:"Mûre Banane Vanille",emoji:"🫐",c:["#e5c6dc","#5e1f4d"],t:"epais",tags:["antioxydant","gourmand"],desc:"Mûres et vanille, épais et gourmand.",
+  ing:[[180,"ml","lait",3],[60,"g","yaourt vanille",3],[130,"g","mûres surgelées",5],[1,"","banane surgelée",5]],tip:"Parfait en bowl avec des flocons d'avoine."},
+ {id:"avocat-mangue",nom:"Avocat Mangue",emoji:"🥑",c:["#f1f7c4","#9cbf3b"],t:"cremeux",tags:["vert","fruité"],desc:"Avocat crémeux et mangue sucrée.",
+  ing:[[0.5,"","avocat",1],[200,"ml","jus d'orange",3],[150,"g","mangue surgelée",5]],tip:"Un avocat bien mûr donne une texture de crème."},
+ {id:"matcha-mangue",nom:"Matcha Mangue",emoji:"🍵",c:["#eef5c8","#9bbf4a"],t:"cremeux",tags:["énergie","vert"],desc:"Matcha et mangue, un mariage étonnant.",
+  ing:[[200,"ml","lait végétal au choix",3],[1,"c. à c.","matcha",4],[1,"c. à c.","miel",4],[150,"g","mangue surgelée",5]],tip:"Le matcha contient de la caféine : plutôt le matin."},
+ {id:"golden-banane",nom:"Golden Banane",emoji:"✨",c:["#fff3c0","#f2b705"],t:"cremeux",tags:["épicé","petit-déj"],desc:"Lait d'or à la banane, doux et épicé.",
+  ing:[[1,"","banane",1],[200,"ml","lait",3],[0.5,"c. à c.","curcuma",4],[1,"pincée","cannelle",4],[1,"c. à c.","miel",4],[4,"","glaçons",5]],tip:"Le safran péi (curcuma frais) marche aussi : 1 cm."},
+ {id:"tropical-bowl",nom:"Tropical Bowl",emoji:"🌺",c:["#fff0a8","#ff9f43"],t:"epais",tags:["petit-déj","péi"],desc:"Le bowl tropical à garnir de fruits frais.",
+  ing:[[60,"ml","lait de coco",3],[120,"g","ananas surgelé",5],[1,"","banane surgelée",5],[80,"g","mangue surgelée",5]],tip:"Arrête et racle les bords si ça bloque, c'est très épais."},
+ {id:"fraise-mojito",nom:"Fraise Mojito",emoji:"🍓",c:["#ffd6dc","#e63958"],t:"glace",tags:["été","léger"],desc:"Fraise, menthe et citron vert sur glace.",
+  ing:[[150,"g","fraises fraîches",1],[6,"feuilles","menthe",2],[150,"ml","eau",3],[1,"c. à s.","jus de citron vert",3],[1,"c. à c.","sirop d'agave",4],[6,"","glaçons",5]],tip:"Décore avec une fraise coupée sur le bord du verre."},
+ {id:"belle-helene",nom:"Poire Belle-Hélène",emoji:"🍐",c:["#efe6d0","#6b4a2e"],t:"cremeux",tags:["gourmand","automne"],desc:"Poire et chocolat, le dessert classique.",
+  ing:[[1,"","poire mûre",1],[200,"ml","lait",3],[1,"c. à s.","cacao",4],[1,"c. à c.","sucre vanillé",4],[5,"","glaçons",5]],tip:"Une poire très mûre suffit à sucrer."},
+ {id:"grenade-framboise",nom:"Grenade Framboise",emoji:"🔴",c:["#ffd0da","#b8003b"],t:"slushy",tags:["antioxydant","été"],desc:"Un granité rubis plein d'antioxydants.",
+  ing:[[150,"ml","jus de grenade",3],[120,"g","framboises surgelées",5],[6,"","glaçons",5]],tip:"Filtre si tu n'aimes pas les pépins de framboise."},
+ {id:"rocket",nom:"Morning Rocket",emoji:"🚀",c:["#f0d9b5","#7a4b26"],t:"epais",tags:["énergie","protéiné"],desc:"Café, banane et cacahuète pour décoller.",
+  ing:[[100,"ml","café froid",3],[150,"ml","lait",3],[1,"c. à s.","beurre de cacahuète",4],[1,"","banane surgelée",5]],tip:"Remplace le café par du lait pour une version sans caféine."},
+
+ /* ---- Laits végétaux ---- */
+ {id:"veg-latte",nom:"Iced Latte Végétal",emoji:"☕",c:["#efe2d0","#8a5a3c"],t:"glace",tags:["énergie","été"],desc:"Café glacé avec le lait végétal de ton choix.",
+  ing:[[120,"ml","café froid",3],[150,"ml","lait végétal au choix",3],[1,"c. à c.","sirop d'érable",4],[8,"","glaçons",5]],tip:"Avoine pour le côté crémeux, amande pour la légèreté."},
+ {id:"veg-matcha",nom:"Iced Matcha Végétal",emoji:"🍵",c:["#e6f3cf","#7fb24a"],t:"glace",tags:["vert","énergie"],desc:"Le matcha latte glacé, version végétale.",
+  ing:[[220,"ml","lait végétal au choix",3],[1,"c. à c.","matcha",4],[1,"c. à c.","miel",4],[8,"","glaçons",5]],tip:"Mixe d'abord le matcha avec le lait, puis ajoute la glace."},
+ {id:"veg-fraise-givree",nom:"Fraise Givrée Végétale",emoji:"🍓",c:["#ffd6dc","#ff4d6d"],t:"slushy",tags:["fruité","été"],desc:"Un granité fraise tout doux au lait végétal.",
+  ing:[[100,"ml","lait végétal au choix",3],[50,"ml","eau",3],[1,"c. à c.","sirop d'agave",4],[150,"g","fraises surgelées",5],[6,"","glaçons",5]],tip:"Fais quelques PULSE à la fin pour garder des cristaux."},
+ {id:"veg-mangue-givree",nom:"Mangue Givrée Végétale",emoji:"🥭",c:["#fff0b8","#ffa630"],t:"slushy",tags:["péi","été"],desc:"Mangue et lait végétal en granité.",
+  ing:[[100,"ml","lait végétal au choix",3],[1,"c. à c.","jus de citron vert",3],[120,"g","mangue surgelée",5],[8,"","glaçons",5]],tip:"Le lait de riz rend ce granité naturellement sucré."},
+ {id:"veg-melon",nom:"Melon Végétal Léger",emoji:"🍈",c:["#fff2d0","#ffb26b"],t:"leger",tags:["été","léger"],desc:"Melon juteux allongé de lait végétal.",
+  ing:[[200,"g","melon",1],[100,"ml","lait végétal au choix",3],[50,"ml","eau",3],[4,"","glaçons",5]],tip:"Un melon bien mûr, sinon c'est fade."},
+ {id:"veg-ananas",nom:"Ananas Végétal Léger",emoji:"🍍",c:["#fff8c8","#f6c90e"],t:"leger",tags:["léger","péi"],desc:"Ananas frais, eau de coco et lait végétal.",
+  ing:[[150,"g","ananas frais",1],[100,"ml","lait végétal au choix",3],[100,"ml","eau de coco",3],[4,"","glaçons",5]],tip:"Le lait de soja peut cailler avec l'ananas : prends plutôt amande ou avoine."},
+ {id:"veg-peche",nom:"Pêche Végétale",emoji:"🍑",c:["#ffe3c4","#f79d65"],t:"cremeux",tags:["fruité","été"],desc:"Pêche fondante et lait végétal, tout simple.",
+  ing:[[1,"","pêche fraîche",1],[200,"ml","lait végétal au choix",3],[1,"c. à c.","sirop d'agave",4],[4,"","glaçons",5]],tip:"Hors saison, 150 g de pêches surgelées et pas de glaçons."},
+ {id:"veg-pb-bowl",nom:"PB Végétal Bowl",emoji:"🥜",c:["#f1d6a8","#9a6a3a"],t:"epais",tags:["protéiné","gourmand"],desc:"Bowl cacahuète-cacao ultra épais, sans lactose.",
+  ing:[[120,"ml","lait végétal au choix",3],[1,"c. à s.","beurre de cacahuète",4],[1,"c. à c.","cacao",4],[2,"","bananes surgelées",5]],tip:"Racle les bords entre deux PULSE, c'est très épais."},
+ {id:"amande-glace",nom:"Amande Vanille Glacé",emoji:"🥛",c:["#faf3e6","#d9c0a0"],t:"glace",tags:["gourmand","été"],desc:"Lait d'amande vanillé sur glace, très rafraîchissant.",
+  ing:[[220,"ml","lait d'amande",3],[1,"c. à c.","sucre vanillé",4],[1,"gouttes","extrait d'amande amère",4],[8,"","glaçons",5]],tip:"Une seule goutte d'extrait suffit."},
+ {id:"amande-cerise-givree",nom:"Cerise Amande Givrée",emoji:"🍒",c:["#ffd1dc","#a4133c"],t:"slushy",tags:["fruité","été"],desc:"Cerise et amande en granité.",
+  ing:[[120,"ml","lait d'amande",3],[1,"c. à c.","miel",4],[150,"g","cerises surgelées",5],[5,"","glaçons",5]],tip:"Vérifie qu'il ne reste aucun noyau."},
+ {id:"amande-datte",nom:"Amande Datte",emoji:"🌴",c:["#f4e2c6","#a07040"],t:"epais",tags:["rassasiant","gourmand"],desc:"Épais, doux et naturellement sucré.",
+  ing:[[180,"ml","lait d'amande",3],[1,"c. à s.","purée d'amande",4],[3,"","dattes",4],[1,"","banane surgelée",5]],tip:"Les dattes Medjool se mixent le mieux."},
+ {id:"avoine-granite-cafe",nom:"Granité Café Avoine",emoji:"☕",c:["#ecdcc8","#6b4226"],t:"slushy",tags:["énergie","été"],desc:"Le café givré au lait d'avoine.",
+  ing:[[100,"ml","café froid",3],[100,"ml","lait d'avoine",3],[1,"c. à c.","sucre",4],[10,"","glaçons",5]],tip:"Des glaçons de café donnent un granité plus intense."},
+ {id:"avoine-myrtille",nom:"Myrtille Avoine",emoji:"🫐",c:["#d6dcff","#5a6ad0"],t:"cremeux",tags:["petit-déj","antioxydant"],desc:"Myrtilles et lait d'avoine, doux et violet.",
+  ing:[[0.5,"","banane",1],[200,"ml","lait d'avoine",3],[1,"c. à c.","graines de lin",4],[120,"g","myrtilles surgelées",5]],tip:"Le lait d'avoine rend tout plus crémeux."},
+ {id:"avoine-poire",nom:"Poire Avoine Légère",emoji:"🍐",c:["#f5f0d0","#c9b458"],t:"leger",tags:["léger","automne"],desc:"Poire, lait d'avoine et cannelle, tout léger.",
+  ing:[[1,"","poire",1],[100,"ml","lait d'avoine",3],[100,"ml","eau",3],[1,"pincée","cannelle",4],[4,"","glaçons",5]],tip:"Garde la peau de la poire : plus de fibres."},
+ {id:"soja-choco-glace",nom:"Choco Soja Glacé",emoji:"🍫",c:["#e6d0ba","#5c3a21"],t:"glace",tags:["gourmand","protéiné"],desc:"Chocolat froid au lait de soja, plein de protéines.",
+  ing:[[220,"ml","lait de soja",3],[1,"c. à s.","cacao",4],[1,"c. à c.","sirop d'agave",4],[8,"","glaçons",5]],tip:"Le soja chocolat du commerce marche aussi : enlève le cacao."},
+ {id:"soja-myrtille-bowl",nom:"Myrtille Soja Bowl",emoji:"🫐",c:["#d0d6ff","#4b5bd6"],t:"epais",tags:["protéiné","antioxydant"],desc:"Le bowl violet protéiné.",
+  ing:[[100,"ml","lait de soja",3],[20,"g","flocons d'avoine",4],[120,"g","myrtilles surgelées",5],[1,"","banane surgelée",5]],tip:"Garnis de granola et de graines."},
+ {id:"soja-mangue-givree",nom:"Mangue Soja Givrée",emoji:"🥭",c:["#fff2c0","#ffb000"],t:"slushy",tags:["protéiné","été"],desc:"Mangue et soja en granité.",
+  ing:[[120,"ml","lait de soja",3],[1,"c. à c.","jus de citron vert",3],[130,"g","mangue surgelée",5],[6,"","glaçons",5]],tip:"Le citron vert équilibre le goût du soja."},
+ {id:"horchata",nom:"Horchata Glacée",emoji:"🍚",c:["#fbf5ea","#d9b98a"],t:"glace",tags:["épicé","été"],desc:"Lait de riz, cannelle et vanille, façon horchata.",
+  ing:[[220,"ml","lait de riz",3],[0.5,"c. à c.","cannelle",4],[1,"c. à c.","sucre vanillé",4],[8,"","glaçons",5]],tip:"Saupoudre de cannelle au moment de servir."},
+ {id:"riz-fraise",nom:"Fraise Riz Léger",emoji:"🍓",c:["#ffe0e4","#ff6b7a"],t:"leger",tags:["fruité","léger"],desc:"Fraises fraîches et lait de riz, très léger.",
+  ing:[[150,"g","fraises fraîches",1],[150,"ml","lait de riz",3],[50,"ml","eau",3],[4,"","glaçons",5]],tip:"Pas besoin de sucre : le lait de riz l'est déjà."},
+ {id:"riz-coco-bowl",nom:"Riz Coco Bowl",emoji:"🥥",c:["#fbf3e2","#e0b96a"],t:"epais",tags:["péi","gourmand"],desc:"Banane, mangue, riz et coco en bowl épais.",
+  ing:[[120,"ml","lait de riz",3],[1,"c. à s.","noix de coco râpée",4],[60,"g","mangue surgelée",5],[1.5,"","banane surgelée",5]],tip:"Garnis de fruits frais et de coco râpée."},
+ {id:"noisette-givree",nom:"Noisette Givrée",emoji:"🌰",c:["#efdcc6","#7a4b26"],t:"slushy",tags:["gourmand","énergie"],desc:"Un granité noisette-cacao.",
+  ing:[[150,"ml","lait de noisette",3],[1,"c. à c.","cacao",4],[1,"c. à c.","sirop d'érable",4],[10,"","glaçons",5]],tip:"Une pincée de sel fait ressortir la noisette."},
+ {id:"figue-noisette",nom:"Figue Noisette",emoji:"🌰",c:["#ead0dc","#8c5a76"],t:"cremeux",tags:["automne","gourmand"],desc:"Figues fraîches et lait de noisette.",
+  ing:[[3,"","figues fraîches",1],[200,"ml","lait de noisette",3],[1,"c. à c.","miel",4],[4,"","glaçons",5]],tip:"Hors saison, 4 figues sèches trempées."},
+ {id:"coco-passion-leger",nom:"Coco Passion Léger",emoji:"🥥",c:["#fff6dc","#ffb627"],t:"leger",tags:["péi","léger"],desc:"Boisson coco, eau de coco et passion.",
+  ing:[[2,"","fruits de la passion (pulpe)",1],[150,"ml","lait de coco (boisson)",3],[100,"ml","eau de coco",3],[4,"","glaçons",5]],tip:"Filtre les graines si tu préfères."},
+ {id:"noisette-choco",nom:"Choco Noisette",emoji:"🌰",c:["#ead2b8","#6b3e1f"],t:"epais",tags:["gourmand","énergie"],desc:"Le goût de la pâte à tartiner, en shake.",
+  ing:[[200,"ml","lait de noisette",3],[1,"c. à s.","cacao",4],[1,"c. à s.","purée de noisette",4],[1,"c. à c.","sirop d'érable",4],[1.5,"","banane surgelée",5]],tip:"Torréfie quelques noisettes à la poêle pour le dessus."},
+ {id:"noisette-cafe",nom:"Noisette Latte Glacé",emoji:"☕",c:["#efdcc6","#8a5a3c"],t:"glace",tags:["énergie","gourmand"],desc:"Café et lait de noisette sur glace.",
+  ing:[[120,"ml","café froid",3],[150,"ml","lait de noisette",3],[1,"c. à c.","sirop d'érable",4],[8,"","glaçons",5]],tip:"Le lait de noisette mousse bien : mixe 10 s de plus."},
+ {id:"poire-noisette",nom:"Poire Noisette",emoji:"🍐",c:["#f3ead2","#b08a4a"],t:"cremeux",tags:["automne","gourmand"],desc:"Poire fondante et noisette, très doux.",
+  ing:[[1,"","poire mûre",1],[200,"ml","lait de noisette",3],[1,"pincée","cannelle",4],[1,"c. à c.","miel",4],[4,"","glaçons",5]],tip:"Une poire très mûre suffit à sucrer."},
+ {id:"banane-noisette",nom:"Banane Noisette Avoine",emoji:"🌰",c:["#f2e2c2","#a8743c"],t:"epais",tags:["petit-déj","rassasiant"],desc:"Le petit-déj complet à la noisette.",
+  ing:[[220,"ml","lait de noisette",3],[30,"g","flocons d'avoine",4],[1,"c. à c.","cannelle",4],[1,"","banane surgelée",5]],tip:"Prépare-le la veille, il sera encore meilleur."},
+ {id:"soja-vanille",nom:"Soja Vanille Protéiné",emoji:"🫘",c:["#f7efd8","#d8c08a"],t:"cremeux",tags:["protéiné","post-sport"],desc:"Le shake végétal le plus riche en protéines.",
+  ing:[[250,"ml","lait de soja",3],[1,"c. à c.","sucre vanillé",4],[20,"g","flocons d'avoine",4],[1,"c. à s.","beurre de cacahuète",4],[1,"","banane surgelée",5]],tip:"Le soja apporte autant de protéines que le lait de vache."},
+ {id:"soja-fraise",nom:"Fraise Soja",emoji:"🍓",c:["#ffd6dc","#e8476b"],t:"cremeux",tags:["fruité","protéiné"],desc:"Fraise et soja, doux et protéiné.",
+  ing:[[200,"ml","lait de soja",3],[1,"c. à c.","miel",4],[150,"g","fraises surgelées",5],[0.5,"","banane surgelée",5]],tip:"Un soja à la vanille rend le tout encore plus gourmand."},
+ {id:"riz-cannelle",nom:"Riz au Lait Cannelle",emoji:"🍚",c:["#fbf4e6","#d9b98a"],t:"cremeux",tags:["gourmand","épicé"],desc:"Le goût du riz au lait, en version végétale.",
+  ing:[[1,"","banane",1],[200,"ml","lait de riz",3],[1,"c. à c.","cannelle",4],[1,"c. à c.","sucre vanillé",4],[4,"","glaçons",5]],tip:"Le lait de riz est naturellement sucré : pas besoin d'en rajouter."},
+ {id:"riz-mangue",nom:"Mango Sticky Rice",emoji:"🥭",c:["#fff1c4","#ffb627"],t:"cremeux",tags:["fruité","péi"],desc:"Mangue, riz et coco, comme le dessert thaï.",
+  ing:[[150,"ml","lait de riz",3],[50,"ml","lait de coco",3],[150,"g","mangue surgelée",5],[3,"","glaçons",5]],tip:"Saupoudre de graines de sésame grillées."},
+ {id:"avoine-latte",nom:"Oat Latte Cannelle",emoji:"🌾",c:["#efe2cf","#9b6a3d"],t:"glace",tags:["énergie","épicé"],desc:"Café glacé au lait d'avoine et cannelle.",
+  ing:[[120,"ml","café froid",3],[150,"ml","lait d'avoine",3],[1,"pincée","cannelle",4],[1,"c. à c.","sirop d'érable",4],[7,"","glaçons",5]],tip:"Le lait d'avoine « barista » mousse encore mieux."},
+ {id:"avoine-pomme",nom:"Pomme Avoine Crumble",emoji:"🍏",c:["#f1ebc8","#b9954a"],t:"epais",tags:["petit-déj","automne"],desc:"Pomme, avoine et cannelle façon crumble.",
+  ing:[[1,"","pomme",1],[200,"ml","lait d'avoine",3],[30,"g","flocons d'avoine",4],[1,"c. à c.","cannelle",4],[1,"c. à c.","sirop d'érable",4],[4,"","glaçons",5]],tip:"Garde une cuillère de flocons pour le dessus."},
+ {id:"vegetal-banane",nom:"Banane Végétale Express",emoji:"🍌",c:["#fff6cc","#f2c94c"],t:"cremeux",tags:["petit-déj","enfants"],desc:"Le plus simple : banane et lait végétal, c'est tout.",
+  ing:[[1,"","banane",1],[200,"ml","lait végétal au choix",3],[1,"pincée","cannelle",4],[4,"","glaçons",5]],tip:"Marche avec tous les laits végétaux : à toi de choisir."},
+ {id:"vegetal-rouge",nom:"Fruits Rouges Végétal",emoji:"🍓",c:["#f6c6d4","#c0305e"],t:"cremeux",tags:["fruité","antioxydant"],desc:"Fruits rouges et lait végétal, sans lactose.",
+  ing:[[0.5,"","banane",1],[200,"ml","lait végétal au choix",3],[1,"c. à c.","sirop d'agave",4],[150,"g","fruits rouges surgelés",5]],tip:"Le lait d'avoine donne le résultat le plus crémeux."},
+ {id:"vegetal-mangue",nom:"Mangue Végétale",emoji:"🥭",c:["#fff0b8","#ffa630"],t:"cremeux",tags:["fruité","péi"],desc:"Mangue et lait végétal, simple et doux.",
+  ing:[[200,"ml","lait végétal au choix",3],[1,"c. à c.","jus de citron vert",3],[180,"g","mangue surgelée",5]],tip:"Avec du lait de riz, c'est naturellement plus sucré."},
+ {id:"vegetal-choco",nom:"Choco Végétal",emoji:"🍫",c:["#e2c8ae","#5c3a21"],t:"epais",tags:["gourmand","enfants"],desc:"Le chocolat chaud… en version froide et sans lait.",
+  ing:[[220,"ml","lait végétal au choix",3],[1,"c. à s.","cacao",4],[2,"","dattes",4],[1,"","banane surgelée",5]],tip:"Avec le lait de noisette, c'est le top."},
+ {id:"vegetal-vert",nom:"Green Végétal",emoji:"🥬",c:["#e0f5c8","#5fae4a"],t:"cremeux",tags:["vert","petit-déj"],desc:"Épinards, banane et lait végétal, doux et vert.",
+  ing:[[1,"","banane",1],[40,"g","épinards",2],[200,"ml","lait végétal au choix",3],[1,"c. à c.","graines de chia",4],[4,"","glaçons",5]],tip:"La banane masque complètement le goût des épinards."},
+];
+
+/* ---------- utils ---------- */
+const $ = s => document.querySelector(s);
+const app = $("#app"), topEl = $("#top");
+const store = {
+  get(k,d){ try{ return JSON.parse(localStorage.getItem(k)) ?? d }catch{ return d } },
+  set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)) }catch{} }
+};
+let favs = new Set(store.get("favs",[]));
+let state = {view:"home", univers:store.get("univers","shakies"), ckPick:store.get("ckpick",[]), ckWeek:store.get("ckweek",null), ckN:store.get("ckN",3), ckf:{ty:"tous",cu:"toutes",di:"toutes",m:"toutes"}, randomId:null, picks:[], filter:"tous", base:"toutes", q:"", size:1, side:store.get("side",true), from:"home", week:store.get("week",null), pick:store.get("pick",[]), picker:false, region:store.get("region","reunion"), priceMode:store.get("priceMode","precis"), exFmt:store.get("exFmt","simple")};
+
+function frac(n){
+  const map={0.25:"¼",0.5:"½",0.75:"¾",1.25:"1¼",1.5:"1½",1.75:"1¾",2.5:"2½",3.75:"3¾"};
+  if(map[n]) return map[n];
+  return Number.isInteger(n)? String(n) : String(Math.round(n*10)/10).replace(".",",");
+}
+function qty(q,u,mult){
+  let v=q*mult;
+  if(u==="g"||u==="ml") v=Math.round(v/5)*5; else v=Math.round(v*4)/4;
+  return (frac(v)+" "+u).trim();
+}
+const grad = r => `linear-gradient(160deg, ${r.c[0]}, ${r.c[1]})`;
+const halo = r => `radial-gradient(120% 80% at 50% 30%, ${r.c[0]}, transparent 70%)`;
+const esc = s => s.replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function rng(seed){ let h=0; for(const ch of seed) h=(h*31+ch.charCodeAt(0))>>>0; return ()=>{ h=(h*1664525+1013904223)>>>0; return h/4294967296; }; }
+
+/* ---------- Gobelet illustré (style dessin : contour épais, paille rayée, garnitures selon la consistance) ---------- */
+let uid=0;
+const INK="#2b1d16";
+function mixHex(a,b,t){ const p=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)); const A=p(a),B=p(b);
+  return "#"+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,"0")).join(""); }
+const STAR="M0 -10 Q1.8 -1.8 10 0 Q1.8 1.8 0 10 Q-1.8 1.8 -10 0 Q-1.8 -1.8 0 -10Z";
+function cupSVG(r, enter=true){
+  const id="k"+(++uid), t=r.t, rnd=rng(r.id||"x"), c0=r.c[0], c1=r.c[1];
+  const light=mixHex(c0,"#ffffff",.45), deep=mixHex(c1,INK,.25);
+  const lvl={slushy:66,leger:98,cremeux:86,glace:70,epais:78}[t]||86;
+  const body="M50 84 L190 84 L172 256 Q171 262 165 262 L75 262 Q69 262 68 256 Z";
+  const R2=n=>Math.round(n*10)/10;
+  let inside="", top="", around="";
+
+  /* --- contenu propre à chaque consistance --- */
+  if(t==="slushy"){
+    for(let i=0;i<7;i++) inside+=`<ellipse class="drift" cx="${R2(60+rnd()*120)}" cy="${R2(100+rnd()*150)}" rx="${R2(14+rnd()*16)}" ry="${R2(8+rnd()*12)}" fill="${i%2?light:"#ffffff"}" opacity="${R2(.35+rnd()*.3)}" style="--dl:${R2(-rnd()*6)}s"/>`;
+    top+=`<g class="pop"><path d="M50 70 Q52 46 72 50 Q78 34 98 40 Q108 26 124 34 Q140 26 150 40 Q168 36 172 52 Q190 52 190 70 Z" fill="${light}" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"/>`;
+    for(let i=0;i<9;i++){ const x=62+rnd()*112, y=46+rnd()*18, s=6+rnd()*7;
+      top+=`<path d="M${R2(x)} ${R2(y)} l${R2(s)} ${R2(-s*.4)} l${R2(s*.3)} ${R2(s*.8)} l${R2(-s*.9)} ${R2(s*.3)}Z" fill="#fff" stroke="${INK}" stroke-width="1.6" stroke-linejoin="round"/>`; }
+    top+=`<g transform="translate(98 40) rotate(-35)"><path d="M0 0 Q14 -16 32 -6 Q16 8 0 0Z" fill="#43b05c" stroke="${INK}" stroke-width="2.5"/><path d="M3 -1 Q16 -6 28 -6" stroke="#1f6b33" stroke-width="1.5" fill="none"/></g>
+      <g transform="translate(104 42) rotate(-120)"><path d="M0 0 Q12 -14 28 -5 Q14 7 0 0Z" fill="#5cc46d" stroke="${INK}" stroke-width="2.5"/></g>
+      <g transform="translate(110 40) rotate(-75)"><path d="M0 0 Q13 -15 30 -6 Q15 8 0 0Z" fill="#3a9e51" stroke="${INK}" stroke-width="2.5"/></g></g>`;
+    for(let i=0;i<7;i++){ const a=rnd()*Math.PI*2, d=70+rnd()*40, x=120+Math.cos(a)*d, y=60+Math.sin(a)*d*.55-20, s=5+rnd()*5;
+      around+=`<path class="shard" d="M${R2(x)} ${R2(y)} l${R2(s)} ${R2(-s*.5)} l${R2(-s*.2)} ${R2(s)}Z" fill="${light}" stroke="${INK}" stroke-width="1.4" style="--dx:${R2(x-120)}px;--dy:${R2(y-80)}px;--dl:${R2(-rnd()*3)}s"/>`; }
+  }
+  if(t==="leger"){
+    inside+=`<ellipse cx="120" cy="${lvl}" rx="70" ry="6" fill="${light}" stroke="${INK}" stroke-width="2" opacity=".9"/>`;
+    for(let i=0;i<14;i++) inside+=`<circle class="bub" cx="${R2(62+rnd()*116)}" cy="${R2(240-rnd()*20)}" r="${R2(1.8+rnd()*3)}" fill="#fff" fill-opacity=".55" stroke="${INK}" stroke-width="1.2" style="--t:${R2(2.2+rnd()*2.5)}s;--dl:${R2(-rnd()*4)}s"/>`;
+    for(let i=0;i<5;i++){ const x=66+rnd()*100, y=lvl-4+rnd()*14, s=10+rnd()*6;
+      top+=`<rect class="chunk" x="${R2(x)}" y="${R2(y)}" width="${R2(s)}" height="${R2(s*.85)}" rx="3" transform="rotate(${R2(rnd()*50-25)} ${R2(x+s/2)} ${R2(y+s/2)})" fill="${mixHex(c0,c1,.35)}" stroke="${INK}" stroke-width="2" style="--dl:${R2(i*.12)}s"/>`; }
+    for(let i=0;i<5;i++){ const x=50+rnd()*140, y=20+rnd()*30;
+      around+=`<path class="tw" d="M${R2(x)} ${R2(y)} q-4 6 0 9 q4 -3 0 -9z" fill="${c0}" stroke="${INK}" stroke-width="1.4" style="--dl:${R2(-rnd()*2)}s"/>`; }
+  }
+  if(t==="cremeux"){
+    for(let i=0;i<26;i++) inside+=`<circle cx="${R2(60+rnd()*120)}" cy="${R2(lvl+8+rnd()*160)}" r="${R2(.8+rnd()*1.3)}" fill="${deep}" opacity=".35"/>`;
+    top+=`<path class="foam" d="M50 72 Q56 58 70 62 Q80 52 94 58 Q106 50 120 56 Q134 50 146 58 Q160 52 170 62 Q186 58 190 72 Z" fill="${mixHex(c0,"#fff8ee",.6)}" stroke="${INK}" stroke-width="3.2" stroke-linejoin="round"/>`;
+    for(let i=0;i<16;i++) top+=`<circle cx="${R2(64+rnd()*112)}" cy="${R2(60+rnd()*10)}" r="${R2(.9+rnd()*1.2)}" fill="#8a4b23" opacity=".75"/>`;
+    top+=`<g class="drop" style="--dl:0s"><g transform="translate(70 14) rotate(-24)"><rect width="13" height="58" rx="4" fill="#a0522d" stroke="${INK}" stroke-width="2.8"/><path d="M4 2 V56" stroke="#6b3216" stroke-width="2"/></g>
+        <g transform="translate(82 10) rotate(-16)"><rect width="12" height="56" rx="4" fill="#b8642f" stroke="${INK}" stroke-width="2.8"/><path d="M4 2 V54" stroke="#6b3216" stroke-width="2"/></g></g>
+      <g class="drop" style="--dl:.15s"><path d="M126 66 Q132 30 120 6" stroke="${INK}" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M126 66 Q132 30 120 6" stroke="#5a3a22" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+        <path d="M134 66 Q146 34 142 12" stroke="${INK}" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M134 66 Q146 34 142 12" stroke="#6e4628" stroke-width="4.5" fill="none" stroke-linecap="round"/></g>`;
+    for(let i=0;i<6;i++) around+=`<circle class="tw" cx="${R2(40+rnd()*160)}" cy="${R2(10+rnd()*40)}" r="${R2(1.5+rnd()*2)}" fill="#8a4b23" style="--dl:${R2(-rnd()*2)}s"/>`;
+  }
+  if(t==="glace"){
+    for(let i=0;i<20;i++) inside+=`<circle cx="${R2(60+rnd()*120)}" cy="${R2(lvl+16+rnd()*160)}" r="${R2(.8+rnd()*1.4)}" fill="#fff" opacity=".55"/>`;
+    const scoop=mixHex(c0,c1,.4);
+    top+=`<g class="scoop"><path d="M76 68 Q66 34 96 20 Q122 6 148 20 Q176 36 164 68 Z" fill="${scoop}" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"/>
+        <path d="M92 34 Q104 24 118 26" stroke="#fff" stroke-opacity=".6" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+    const sp=["#ffd166","#06d6a0","#118ab2","#ef476f","#ffffff"];
+    for(let i=0;i<9;i++){ const x=90+rnd()*64, y=24+rnd()*30; top+=`<rect x="${R2(x)}" y="${R2(y)}" width="7" height="2.6" rx="1.3" transform="rotate(${R2(rnd()*180)} ${R2(x+3.5)} ${R2(y+1.3)})" fill="${sp[i%5]}" stroke="${INK}" stroke-width=".8"/>`; }
+    top+=`<g class="cherry"><path d="M150 14 Q156 0 166 -4" stroke="${INK}" stroke-width="2.4" fill="none"/><circle cx="150" cy="18" r="9" fill="#d62839" stroke="${INK}" stroke-width="2.6"/><circle cx="147" cy="15" r="2.4" fill="#fff" opacity=".7"/></g></g>
+      <g class="gdrip"><path d="M86 66 Q86 86 92 90 Q98 86 97 66Z" fill="${scoop}" stroke="${INK}" stroke-width="2.6"/><path d="M146 66 Q146 80 151 83 Q156 80 156 66Z" fill="${scoop}" stroke="${INK}" stroke-width="2.6"/></g>`;
+  }
+  if(t==="epais"){
+    for(let i=0;i<16;i++){ const x=60+rnd()*120, y=lvl+14+rnd()*160;
+      inside+=`<ellipse cx="${R2(x)}" cy="${R2(y)}" rx="4.2" ry="2.4" transform="rotate(${R2(rnd()*180)} ${R2(x)} ${R2(y)})" fill="#f1d9a8" stroke="${INK}" stroke-width="1.2"/>`; }
+    for(let i=0;i<6;i++){ const x=64+rnd()*112, y=lvl+20+rnd()*150; inside+=berry(x,y,5.5,deep); }
+    top+=`<path class="gloop" d="M50 ${lvl+2} Q60 ${lvl-8} 74 ${lvl-4} Q88 ${lvl-12} 104 ${lvl-5} Q120 ${lvl-13} 136 ${lvl-5} Q152 ${lvl-12} 166 ${lvl-4} Q182 ${lvl-8} 190 ${lvl+2} Z" fill="${deep}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`;
+    for(let i=0;i<7;i++){ const x=62+rnd()*114, y=lvl-8+rnd()*6;
+      top+=`<ellipse class="popb" cx="${R2(x)}" cy="${R2(y)}" rx="5" ry="2.8" transform="rotate(${R2(rnd()*180)} ${R2(x)} ${R2(y)})" fill="#f1d9a8" stroke="${INK}" stroke-width="1.4" style="--dl:${R2(i*.08)}s"/>`; }
+    for(let i=0;i<3;i++){ const x=80+i*36+rnd()*10, y=lvl-10; top+=`<g class="popb" style="--dl:${R2(.3+i*.1)}s">${berry(x,y,7,deep)}</g>`; }
+    for(let i=0;i<5;i++){ const x=40+rnd()*160, y=8+rnd()*40;
+      around+= i%2 ? `<circle class="tw" cx="${R2(x)}" cy="${R2(y)}" r="4" fill="${c1}" stroke="${INK}" stroke-width="1.4" style="--dl:${R2(-rnd()*2)}s"/>`
+        : `<ellipse class="tw" cx="${R2(x)}" cy="${R2(y)}" rx="4.5" ry="2.5" fill="#f1d9a8" stroke="${INK}" stroke-width="1.2" style="--dl:${R2(-rnd()*2)}s"/>`; }
+  }
+
+  // éclaboussures au sol et étincelles
+  let ground="";
+  for(let i=0;i<7;i++){ const x=36+rnd()*168, y=284+rnd()*10, rx=3+rnd()*7;
+    ground+=`<ellipse cx="${R2(x)}" cy="${R2(y)}" rx="${R2(rx)}" ry="${R2(rx*.45)}" fill="${i%3?c1:c0}" opacity=".85"/>`; }
+  const sparks=[[28,70,1.1],[212,90,.9],[34,232,.8],[206,200,.7]].map(([x,y,s],i)=>
+    `<path class="spark" d="${STAR}" transform="translate(${x} ${y}) scale(${s})" fill="#f6d365" stroke="${INK}" stroke-width="2" style="--dl:${i*.5}s"/>`).join("");
+  const motion=`<g class="ml" stroke="${INK}" stroke-width="2.6" fill="none" stroke-linecap="round">
+    <path d="M30 128 q-8 14 0 28"/><path d="M20 134 q-6 9 0 18"/><path d="M210 150 q8 14 0 28"/><path d="M220 156 q6 9 0 18"/></g>`;
+  const straw=`<g class="straw"><g transform="translate(150 132) rotate(14)"><rect x="-6.5" y="-128" width="13" height="236" rx="5" fill="url(#${id}st)" stroke="${INK}" stroke-width="3"/></g></g>`;
+
+  return `<svg viewBox="0 0 240 300" role="img" aria-label="Gobelet de ${esc(r.nom||"")}" class="cupsvg t-${t}${enter?" enter":""}">
+  <defs>
+    <clipPath id="${id}c"><rect x="48" y="62" width="144" height="24"/><path d="M53 84 L187 84 L169 254 Q168 259 163 259 L77 259 Q72 259 71 254 Z"/></clipPath>
+    <clipPath id="${id}up"><rect x="0" y="-60" width="240" height="122"/></clipPath>
+    <linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${light}"/><stop offset=".45" stop-color="${c0}"/><stop offset="1" stop-color="${c1}"/></linearGradient>
+    <pattern id="${id}hd" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r=".95" fill="${INK}" opacity=".22"/></pattern>
+    <pattern id="${id}st" width="13" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(-35)"><rect width="13" height="16" fill="#fff"/><rect width="13" height="7" fill="#e63946"/></pattern>
+  </defs>
+  <ellipse cx="120" cy="284" rx="74" ry="8" fill="${INK}" opacity=".07"/>
+  ${ground}${motion}
+  <g class="cupb">
+    ${straw}
+    <path d="${body}" fill="#ffffff" fill-opacity=".35"/>
+    <rect x="44" y="60" width="152" height="26" rx="7" fill="#ffffff" fill-opacity=".35"/>
+    <g clip-path="url(#${id}c)"><g class="liq">
+      <rect x="40" y="${lvl}" width="160" height="${262-lvl}" fill="url(#${id}g)" opacity=".93"/>
+      ${inside}
+      <rect x="40" y="${lvl}" width="160" height="${262-lvl}" fill="url(#${id}hd)"/>
+    </g></g>
+    <g stroke="${INK}" stroke-opacity=".14" stroke-width="2"><path d="M86 90 L94 252"/><path d="M120 90 V254"/><path d="M154 90 L146 252"/></g>
+    <path d="M60 92 L76 250" stroke="#fff" stroke-opacity=".55" stroke-width="7" stroke-linecap="round"/>
+    <path d="M176 96 L168 200" stroke="#fff" stroke-opacity=".4" stroke-width="3" stroke-linecap="round"/>
+    <path d="M68 260 L172 260 L175 280 L65 280 Z" fill="#f4ede6" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"/>
+    <g fill="${INK}">${[76,92,108,124,140,156].map(x=>`<rect x="${x}" y="272" width="8" height="8" rx="2"/>`).join("")}</g>
+    <path d="${body}" fill="none" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>
+    <rect x="44" y="60" width="152" height="26" rx="7" fill="none" stroke="${INK}" stroke-width="4"/>
+    <path d="M50 73 H190" stroke="${INK}" stroke-width="2" stroke-opacity=".5"/>
+    <g class="top">${top}</g>
+    <g clip-path="url(#${id}up)">${straw}</g>
+    ${t==="slushy"||t==="glace"?"":`<ellipse cx="120" cy="60" rx="76" ry="7" fill="none" stroke="${INK}" stroke-width="3"/>`}
+  </g>
+  ${around}${sparks}
+  </svg>`;
+}
+function berry(x,y,r,col){
+  return `<circle cx="${Math.round(x)}" cy="${Math.round(y)}" r="${r}" fill="${col}" stroke="${INK}" stroke-width="1.6"/>`
+   +`<circle cx="${Math.round(x-r*.35)}" cy="${Math.round(y-r*.3)}" r="${(r*.22).toFixed(1)}" fill="#fff" opacity=".7"/>`
+   +`<circle cx="${Math.round(x+r*.3)}" cy="${Math.round(y+r*.25)}" r="${(r*.18).toFixed(1)}" fill="#fff" opacity=".45"/>`;
+}
+
+/* ---------- Liste de courses ---------- */
+const FL="🥬 Fruits & légumes", SG="❄️ Surgelés", FR="🥛 Frais", EP="🥫 Épicerie", PL="🧂 Placard (vérifie que tu en as)";
+const RAYONS=[FL,SG,FR,EP,PL];
+// clé: [nom, rayon, unité de base, taille du lot, libellé du lot, prix indicatif €, (base par pièce)]
+const CAT = {
+ banane:["Bananes",FL,"pc",1,"banane",0.3], pomme:["Pommes",FL,"pc",1,"pomme",0.45], poire:["Poires",FL,"pc",1,"poire",0.6],
+ orange:["Oranges",FL,"pc",1,"orange",0.5], clementine:["Clémentines",FL,"pc",1,"clémentine",0.25],
+ citron:["Citrons",FL,"ml",40,"citron",0.5,40], citronvert:["Citrons verts",FL,"ml",30,"citron vert",0.45,30],
+ pamplemousse:["Pamplemousse rose",FL,"pc",1,"pamplemousse",1.0], kiwi:["Kiwis",FL,"pc",1,"kiwi",0.35],
+ concombre:["Concombre",FL,"pc",1,"concombre",0.9], carotte:["Carottes",FL,"pc",8,"sachet 1 kg",1.3],
+ epinards:["Jeunes pousses d'épinard",FL,"g",125,"sachet 125 g",1.6], kale:["Chou kale",FL,"g",200,"sachet 200 g",2.2],
+ menthe:["Menthe fraîche",FL,"feuilles",30,"botte",1.2], basilic:["Basilic",FL,"feuilles",30,"pot",1.8],
+ gingembre:["Gingembre frais",FL,"g",100,"morceau ~100 g",1.0], avocat:["Avocats",FL,"pc",1,"avocat",1.0],
+ fraises:["Fraises fraîches",FL,"g",500,"barquette 500 g",3.5], pasteque:["Pastèque",FL,"g",1500,"½ pastèque",3.0],
+ melon:["Melon",FL,"g",600,"melon",2.5], figues:["Figues fraîches",FL,"pc",1,"figue",0.5],
+ peche:["Pêches / nectarines",FL,"pc",1,"fruit",0.6], abricot:["Abricots",FL,"pc",1,"abricot",0.3],
+ raisin:["Raisin (à congeler)",FL,"g",500,"grappe 500 g",2.5], ananas:["Ananas frais",FL,"g",600,"ananas",2.5],
+ papaye:["Papaye",FL,"g",400,"papaye",3.0], grenade:["Grenade",FL,"g",200,"grenade",1.5],
+ litchi:["Litchis",FL,"pc",25,"barquette",4.0], betterave:["Betteraves cuites",FL,"pc",4,"barquette de 4",1.5],
+ mangue_s:["Mangue surgelée",SG,"g",500,"sachet 500 g",3.0], ananas_s:["Ananas surgelé",SG,"g",500,"sachet 500 g",2.8],
+ fruitsrouges_s:["Fruits rouges surgelés",SG,"g",500,"sachet 500 g",3.5], framboise_s:["Framboises surgelées",SG,"g",500,"sachet 500 g",3.9],
+ myrtille_s:["Myrtilles surgelées",SG,"g",500,"sachet 500 g",4.5], fraise_s:["Fraises surgelées",SG,"g",1000,"sachet 1 kg",4.5],
+ cerise_s:["Cerises surgelées",SG,"g",500,"sachet 500 g",4.2], peche_s:["Pêches surgelées",SG,"g",500,"sachet 500 g",3.5],
+ mure_s:["Mûres surgelées",SG,"g",500,"sachet 500 g",4.0], cassis_s:["Cassis surgelé",SG,"g",500,"sachet 500 g",4.0],
+ cranberry_s:["Cranberries surgelées",SG,"g",300,"sachet 300 g",3.5], acai_s:["Purée d'açaí surgelée",SG,"g",400,"4 sachets",5.5],
+ pitaya_s:["Pitaya surgelée",SG,"g",400,"sachet 400 g",5.0],
+ lait:["Lait",FR,"ml",1000,"brique 1 L",1.1], amande:["Boisson amande",FR,"ml",1000,"brique 1 L",2.0],
+ avoine_lait:["Boisson avoine",FR,"ml",1000,"brique 1 L",1.8], coco_boisson:["Boisson coco",FR,"ml",1000,"brique 1 L",2.3],
+ yaourt:["Yaourts nature",FR,"g",500,"pack 4 × 125 g",1.2], yaourt_vanille:["Yaourts vanille",FR,"g",500,"pack 4 × 125 g",1.6],
+ yaourt_grec:["Yaourt grec",FR,"g",500,"pot 500 g",2.3], fromage_blanc:["Fromage blanc",FR,"g",500,"pot 500 g",1.5],
+ cream:["Fromage frais (cream cheese)",FR,"g",150,"barquette 150 g",1.8],
+ coco_lait:["Lait de coco",EP,"ml",400,"boîte 400 ml",1.8], jus_orange:["Jus d'orange",EP,"ml",1000,"brique 1 L",1.8],
+ jus_pomme:["Jus de pomme",EP,"ml",1000,"brique 1 L",1.5], jus_ananas:["Jus d'ananas",EP,"ml",1000,"brique 1 L",1.8],
+ jus_raisin:["Jus de raisin",EP,"ml",1000,"brique 1 L",2.0], jus_cranberry:["Jus de cranberry",EP,"ml",1000,"brique 1 L",2.5],
+ jus_grenade:["Jus de grenade",EP,"ml",1000,"bouteille 1 L",3.5], eau_coco:["Eau de coco",EP,"ml",1000,"brique 1 L",3.0],
+ miel:["Miel",EP,"g",250,"pot 250 g",3.5], erable:["Sirop d'érable",EP,"ml",250,"bouteille 250 ml",5.0], agave:["Sirop d'agave",EP,"ml",250,"bouteille 250 ml",3.5],
+ cacahuete:["Beurre de cacahuète",EP,"g",350,"pot 350 g",3.0], amande_puree:["Purée d'amande",EP,"g",250,"pot 250 g",5.0],
+ cajou:["Beurre de cajou",EP,"g",250,"pot 250 g",5.0], cacao:["Cacao non sucré",EP,"g",250,"boîte 250 g",3.0],
+ flocons:["Flocons d'avoine",EP,"g",500,"paquet 500 g",1.2], chia:["Graines de chia",EP,"g",200,"sachet 200 g",3.0],
+ lin:["Graines de lin",EP,"g",250,"sachet 250 g",2.0], chanvre:["Graines de chanvre",EP,"g",200,"sachet 200 g",5.0],
+ coco_rapee:["Noix de coco râpée",EP,"g",125,"sachet 125 g",1.5], noix:["Cerneaux de noix",EP,"g",200,"sachet 200 g",3.0],
+ pecan:["Noix de pécan",EP,"g",100,"sachet 100 g",3.0], dattes:["Dattes",EP,"pc",25,"barquette 250 g",3.5],
+ pepites:["Pépites de chocolat",EP,"g",100,"sachet 100 g",1.5], proteine:["Protéine en poudre",EP,"g",500,"pot 500 g",15],
+ matcha:["Matcha",EP,"g",30,"boîte 30 g",6.0], potiron:["Purée de potiron",EP,"g",400,"boîte 400 g",2.5],
+ biscuit:["Biscuits sablés",EP,"pc",20,"paquet",1.5], sucre_vanille:["Sucre vanillé",EP,"g",75,"10 sachets",1.2],
+ rhubarbe:["Compote de rhubarbe",EP,"g",400,"pot 400 g",2.8],
+ vegetal:["Lait végétal au choix (amande, avoine, soja…)",FR,"ml",1000,"brique 1 L",1.9],
+ noisette_lait:["Boisson noisette",FR,"ml",1000,"brique 1 L",2.5], soja:["Boisson soja",FR,"ml",1000,"brique 1 L",1.6],
+ riz:["Boisson riz",FR,"ml",1000,"brique 1 L",1.8], noisettes:["Noisettes / purée de noisette",EP,"g",125,"sachet 125 g",2.5],
+ passion:["Fruits de la passion",FL,"pc",1,"fruit",0.5], goyavier:["Goyaviers",FL,"g",250,"barquette 250 g",3.0],
+ carambole:["Caramboles",FL,"pc",1,"carambole",0.9], corossol:["Corossol",FL,"g",500,"½ corossol",5.0],
+ tamarin:["Pâte de tamarin",EP,"g",200,"bloc 200 g",2.5],
+ sucre:["Sucre",PL], cannelle:["Cannelle",PL], epices:["Épices à pain d'épices",PL], sel:["Fleur de sel",PL], poivre:["Poivre",PL],
+ curcuma:["Curcuma",PL], cardamome:["Cardamome",PL], muscade:["Muscade",PL], piment:["Piment d'Espelette",PL],
+ vanille:["Vanille",PL], extrait:["Extrait d'amande amère",PL], rose:["Eau de rose",PL], the:["Thé (noir / chai)",PL], cafe:["Café",PL],
+};
+const MAP = [
+ [/glaçon|^eau( froide)?$/,null],
+ [/lait de coco \(boisson\)/,"coco_boisson"],[/lait de coco/,"coco_lait"],[/eau de coco/,"eau_coco"],[/eau de rose/,"rose"],
+ [/végétal/,"vegetal"],[/lait de noisette|boisson noisette/,"noisette_lait"],[/lait de soja|boisson soja/,"soja"],[/lait de riz|boisson riz/,"riz"],
+ [/lait d'amande|boisson d'amande/,"amande"],[/lait d'avoine/,"avoine_lait"],[/^lait/,"lait"],[/noisette/,"noisettes"],
+ [/yaourt grec/,"yaourt_grec"],[/yaourt vanille/,"yaourt_vanille"],[/yaourt|petit-suisse/,"yaourt"],[/fromage blanc/,"fromage_blanc"],[/fromage frais/,"cream"],
+ [/jus d'orange/,"jus_orange"],[/jus de pomme/,"jus_pomme"],[/jus d'ananas/,"jus_ananas"],[/jus de raisin/,"jus_raisin"],[/jus de cranberry/,"jus_cranberry"],[/jus de grenade/,"jus_grenade"],
+ [/citrons? verts?/,"citronvert"],[/citron/,"citron"],[/banane/,"banane"],
+ [/passion/,"passion"],[/goyavier/,"goyavier"],[/carambole/,"carambole"],[/corossol/,"corossol"],[/tamarin/,"tamarin"],[/letchi|litchi/,"litchi"],
+ [/mangue/,"mangue_s"],[/ananas surgel/,"ananas_s"],[/fruits rouges/,"fruitsrouges_s"],[/framboise/,"framboise_s"],[/myrtille/,"myrtille_s"],[/fraises surgel/,"fraise_s"],
+ [/cerise/,"cerise_s"],[/pêches surgel/,"peche_s"],[/mûre/,"mure_s"],[/cassis/,"cassis_s"],[/cranberries/,"cranberry_s"],[/açaí/,"acai_s"],[/pitaya/,"pitaya_s"],[/raisin/,"raisin"],
+ [/fraise/,"fraises"],[/pomme/,"pomme"],[/poire/,"poire"],[/clémentine/,"clementine"],[/pamplemousse/,"pamplemousse"],[/orange/,"orange"],[/kiwi/,"kiwi"],
+ [/concombre/,"concombre"],[/carotte/,"carotte"],[/épinard/,"epinards"],[/kale/,"kale"],[/menthe/,"menthe"],[/basilic/,"basilic"],[/gingembre/,"gingembre"],
+ [/avocat/,"avocat"],[/pastèque/,"pasteque"],[/melon/,"melon"],[/figue/,"figues"],[/pêche|nectarine/,"peche"],[/abricot/,"abricot"],[/ananas/,"ananas"],
+ [/papaye/,"papaye"],[/grenade/,"grenade"],[/litchi/,"litchi"],[/betterave/,"betterave"],[/rhubarbe/,"rhubarbe"],
+ [/miel/,"miel"],[/érable/,"erable"],[/agave/,"agave"],[/cacahuète/,"cacahuete"],[/amande amère/,"extrait"],[/amande/,"amande_puree"],[/cajou/,"cajou"],
+ [/cacao/,"cacao"],[/avoine/,"flocons"],[/chia/,"chia"],[/graines de lin/,"lin"],[/chanvre/,"chanvre"],[/coco râpée/,"coco_rapee"],[/pécan/,"pecan"],[/noix/,"noix"],
+ [/datte/,"dattes"],[/pépites/,"pepites"],[/protéine/,"proteine"],[/matcha/,"matcha"],[/potiron/,"potiron"],[/biscuit/,"biscuit"],
+ [/sucre vanillé/,"sucre_vanille"],[/sucre/,"sucre"],[/cannelle/,"cannelle"],[/épices/,"epices"],[/sel/,"sel"],[/poivre/,"poivre"],[/curcuma/,"curcuma"],
+ [/cardamome/,"cardamome"],[/muscade/,"muscade"],[/piment/,"piment"],[/vanille/,"vanille"],[/thé|chai/,"the"],[/café/,"cafe"],
+];
+const UNIT = {"g":1,"ml":1,"c. à s.":15,"c. à c.":5,"pincée":.5,"gouttes":.05,"dose":30,"cm":5,"feuilles":1};
+const keyCache = {};
+function ingKey(name){
+  if(name in keyCache) return keyCache[name];
+  const n=name.toLowerCase(); let k;
+  const hit = MAP.find(([re])=>re.test(n));
+  if(hit) k=hit[1]; else { k="x_"+n; CAT[k]=[name,EP,"pc",1,"",2]; } // filet de sécurité
+  return keyCache[name]=k;
+}
+// Besoins de chaque recette par article (calculés à la demande)
+const NEED = {};
+function needFor(id){
+  if(NEED[id]) return NEED[id];
+  const r=R.find(x=>x.id===id), m={};
+  if(r) r.ing.forEach(([q,u,n])=>{ const k=ingKey(n); if(!k) return; const c=CAT[k];
+    m[k]=(m[k]||0) + (u==="" ? q*(c[6]||1) : q*(UNIT[u]??1)); });
+  return NEED[id]=m;
+}
+
+/* ---------- Prix : région, saison, mode ---------- */
+// Prix absolus pour les DOM tropicaux (fruits locaux moins chers, fruits importés plus chers)
+const TROPIQUES = {
+ banane:{prix:.35}, ananas:{prix:2.0,label:"ananas Victoria",pack:400},
+ ananas_s:{nom:"Ananas Victoria (à congeler)",rayon:FL,prix:2.0,pack:400,label:"ananas"},
+ mangue_s:{nom:"Mangues (à congeler)",rayon:FL,prix:1.0,pack:300,label:"mangue"},
+ pitaya_s:{nom:"Pitaya (à congeler)",rayon:FL,prix:2.5,pack:300,label:"pitaya"},
+ papaye:{prix:1.6}, litchi:{prix:3.5,label:"barquette ~500 g"}, passion:{prix:.3}, citronvert:{prix:.25},
+ goyavier:{prix:2.5}, carambole:{prix:.6}, corossol:{prix:4.0}, avocat:{prix:.8}, coco_lait:{prix:2.0}, eau_coco:{prix:3.5},
+ gingembre:{prix:1.0}, pomme:{prix:.75}, poire:{prix:.95}, kiwi:{prix:.7}, fraises:{prix:6.0}, raisin:{prix:5.5},
+ abricot:{prix:.7}, peche:{prix:1.2}, figues:{prix:1.3}, melon:{prix:3.5}, pasteque:{prix:3.0},
+};
+const M = (...a)=>a; // mois (1 = janvier)
+const SEASONS = {
+ nord:{ fraises:M(4,5,6,7), abricot:M(6,7,8), peche:M(6,7,8,9), melon:M(6,7,8,9), pasteque:M(6,7,8,9), raisin:M(8,9,10),
+   figues:M(8,9,10), clementine:M(11,12,1,2), kiwi:M(11,12,1,2,3,4), pomme:M(9,10,11,12,1,2,3), poire:M(9,10,11,12,1,2),
+   epinards:M(3,4,5,9,10,11), orange:M(12,1,2,3), citron:M(12,1,2,3,4), concombre:M(5,6,7,8,9), kale:M(10,11,12,1,2),
+   grenade:M(9,10,11,12), basilic:M(6,7,8,9), menthe:M(5,6,7,8,9) },
+ austral:{ litchi:M(11,12,1), mangue_s:M(11,12,1,2), ananas:M(9,10,11,12,1), ananas_s:M(9,10,11,12,1), passion:M(1,2,3,4,5,6),
+   goyavier:M(3,4,5,6), carambole:M(3,4,5,6,7), corossol:M(12,1,2,3,4), avocat:M(3,4,5,6,7,8), fraises:M(7,8,9,10,11),
+   pasteque:M(10,11,12,1,2), melon:M(10,11,12,1,2), pitaya_s:M(12,1,2,3), orange:M(5,6,7,8), clementine:M(5,6,7,8) },
+ caraibes:{ mangue_s:M(4,5,6,7,8), passion:M(6,7,8,9,10), avocat:M(7,8,9,10), pasteque:M(3,4,5,6,7), melon:M(2,3,4,5,6),
+   pitaya_s:M(6,7,8,9,10), corossol:M(4,5,6,7,8), carambole:M(9,10,11,12,1,2) },
+};
+const REGIONS = {
+ reunion:   {nom:"La Réunion", saison:"austral", mult:{[FL]:1.2,[SG]:1.5,[FR]:1.35,[EP]:1.35}, over:TROPIQUES},
+ mayotte:   {nom:"Mayotte", saison:"austral", mult:{[FL]:1.35,[SG]:1.7,[FR]:1.5,[EP]:1.5}, over:TROPIQUES},
+ martinique:{nom:"Martinique", saison:"caraibes", mult:{[FL]:1.25,[SG]:1.5,[FR]:1.4,[EP]:1.4}, over:TROPIQUES},
+ guadeloupe:{nom:"Guadeloupe", saison:"caraibes", mult:{[FL]:1.25,[SG]:1.5,[FR]:1.4,[EP]:1.4}, over:TROPIQUES},
+ guyane:    {nom:"Guyane", saison:"caraibes", mult:{[FL]:1.3,[SG]:1.6,[FR]:1.45,[EP]:1.45}, over:TROPIQUES},
+ metro:     {nom:"France métropolitaine", saison:"nord", mult:{}, over:{}},
+ belgique:  {nom:"Belgique", saison:"nord", mult:{[FL]:1.05,[SG]:1.05,[EP]:1.05}, over:{}},
+};
+const IN_SEASON=.8, OFF_SEASON=1.5;
+const MOIS=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+let priceMemo={};
+function cat(k){
+  const memoKey=state.region+"|"+state.priceMode+"|"+k;
+  if(priceMemo[memoKey]) return priceMemo[memoKey];
+  const c=CAT[k], reg=REGIONS[state.region]||REGIONS.metro, o=reg.over[k]||{};
+  const base = o.prix ?? (c[5]||0)*(reg.mult[c[1]]||1);
+  const months = SEASONS[reg.saison][k];
+  let prix=base, lo=base, hi=base, saison=null;
+  if(months){
+    lo=base*IN_SEASON; hi=base*OFF_SEASON;
+    const avg = base*(IN_SEASON*months.length + OFF_SEASON*(12-months.length))/12;
+    const now = new Date().getMonth()+1, inS = months.includes(now);
+    saison = inS ? "in" : "off";
+    prix = state.priceMode==="moyen" ? avg : (inS ? lo : hi);
+  }
+  return priceMemo[memoKey]={nom:o.nom||c[0], rayon:o.rayon||c[1], pack:o.pack||c[3], label:o.label||c[4],
+    prix, lo, hi, saison, volatile:!!months, staple:c[1]===PL};
+}
+
+function buildList(plan){
+  const need={};
+  plan.forEach(id=>{ const n=needFor(id); for(const k in n) need[k]=(need[k]||0)+n[k]; });
+  let total=0, lo=0, hi=0, distinct=0; const items=[];
+  for(const k in need){
+    const c=cat(k), staple=c.staple;
+    const packs = staple?0:Math.max(1,Math.ceil(need[k]/c.pack-1e-6));
+    const cost = staple?0:packs*c.prix;
+    total+=cost; lo+=staple?0:packs*c.lo; hi+=staple?0:packs*c.hi; if(!staple) distinct++;
+    items.push({k,nom:c.nom,rayon:c.rayon,packs,label:c.label,cost,lo:packs*c.lo,hi:packs*c.hi,saison:c.saison,volatile:c.volatile,staple});
+  }
+  return {items,total,lo,hi,distinct};
+}
+const score = L => L.total + 1.3*L.distinct;
+function greedyRun(N, fixed=[]){
+  const plan=[...fixed], count={};
+  plan.forEach(id=>count[id]=(count[id]||0)+1);
+  if(!plan.length){ const first=R[Math.floor(Math.random()*R.length)].id; plan.push(first); count[first]=1; }
+  while(plan.length<N){
+    let opts=[];
+    for(const r of R){
+      if((count[r.id]||0)>=2) continue;
+      const L=buildList([...plan,r.id]);
+      opts.push([score(L)+(count[r.id]?1.5:0)+Math.random()*1.2, r.id]);
+    }
+    opts.sort((a,b)=>a[0]-b[0]);
+    const id=opts[Math.floor(Math.random()*Math.min(3,opts.length))][1];
+    plan.push(id); count[id]=(count[id]||0)+1;
+  }
+  return plan;
+}
+function generateWeek(N,budget,fixed=[]){
+  if(fixed.length>=N) return {plan:fixed.slice(0,N), reduced:false, over:buildList(fixed).total>budget};
+  const runs=[]; for(let i=0;i<70;i++) runs.push(greedyRun(N,fixed));
+  for(let n=N;n>=Math.max(1,fixed.length);n--){
+    const fits = runs.map(p=>p.slice(0,n)).map(p=>({p,L:buildList(p)})).filter(x=>x.L.total<=budget);
+    if(fits.length){
+      fits.sort((a,b)=>score(a.L)-score(b.L));
+      const pick=fits[Math.floor(Math.random()*Math.min(4,fits.length))];
+      return {plan:pick.p, reduced:n<N};
+    }
+  }
+  if(fixed.length) return {plan:fixed, reduced:true, over:true};
+  return {plan:[], reduced:true};
+}
+const eur = v => v.toFixed(2).replace(".",",")+" €";
+function shopDefaults(){ return state.week || {n:3,budget:30,plan:null,cp:[],checked:[],reduced:false}; }
+const bLabel = b => b>=81 ? "Sans limite" : b+" €";
+
+// Page Courses unique : shakies + plats, une seule liste
+function viewShop(){
+  const w=shopDefaults(), has=!!(w.plan && (w.plan.length || (w.cp||[]).length));
+  let res="";
+  if(w.plan){
+    if(!has) res=`<div class="warn">Budget trop serré 😅 Monte un peu le curseur ou choisis moins de recettes.</div>`;
+    else{
+      const L=buildMerged(w.plan, w.cp), counts={}, mine={};
+      w.plan.forEach(id=>counts[id]=(counts[id]||0)+1);
+      (w.fixed||[]).forEach(id=>mine[id]=(mine[id]||0)+1);
+      const nRec=w.plan.length+(w.cp||[]).length;
+      const hasFrozenBanana = w.plan.some(id=>R.find(r=>r.id===id)?.ing.some(i=>/banane surgel/.test(i[2])));
+      res = `
+      ${w.over?`<div class="warn">Tes recettes choisies coûtent déjà <b>≈ ${eur(L.total)}</b>, au-dessus de ${bLabel(w.budget)}. Rien n'a été ajouté au hasard.</div>`
+        : w.reduced?`<div class="warn">Avec ${bLabel(w.budget)}, on garde <b>${w.plan.length} shakie${w.plan.length>1?"s":""}</b> au lieu de ${w.n}. Augmente le budget pour en avoir plus.</div>`:""}
+      <div class="stats"><div><b>${nRec}</b>recettes</div><div><b>${L.count}</b>articles</div><div><b>${eur(L.total).replace(",00","")}</b>${state.priceMode==="moyen"?"en moyenne":"environ"}</div></div>
+      ${state.priceMode==="moyen" && L.hi-L.lo>0.5 ? `<div class="warn">📊 Prix moyens à ${REGIONS[state.region].nom} : selon la saison et les arrivages, cette liste peut coûter entre <b>${eur(L.lo)}</b> et <b>${eur(L.hi)}</b>. Ces prix ne sont pas exacts.</div>`:""}
+      <div class="panel shop" style="margin-top:12px">
+        <h3>🛒 Ma liste</h3>
+        ${ALL_RAYONS.map(ray=>{ const its=L.items.filter(i=>i.rayon===ray); if(!its.length) return "";
+          return `<div class="rayon">${ray}</div><ul class="ing">${its.map(i=>`<li data-shop="${esc(i.k)}" class="${w.checked.includes(i.k)?"done":""}"><span class="box">✓</span>
+            <span class="q">${esc(i.nom)}${i.qty?`<small>${esc(i.qty)}${state.priceMode==="precis"&&i.saison?(i.saison==="in"?" · 🌱 de saison":" · ⚠️ hors saison"):""}</small>`:""}</span>
+            <span class="p">${i.cost==null?"":(state.priceMode==="moyen"&&i.volatile?`≈ ${eur(i.cost)}<small class="rg">${eur(i.lo)} – ${eur(i.hi)}</small>`:eur(i.cost))}</span></li>`).join("")}</ul>`; }).join("")}
+        ${hasFrozenBanana?`<div class="tip">🍌 Congèle une partie des bananes en rondelles dès ton retour des courses : plusieurs shakies les veulent surgelées.</div>`:""}
+        <p class="muted" style="font-size:.75rem;margin:10px 0 0">Quantités arrondies au lot à acheter (bloc, paquet, barquette…), pas au gramme près.
+          Prix indicatifs pour ${REGIONS[state.region].nom}${state.priceMode==="precis"?` en ${MOIS[new Date().getMonth()]}, saison comprise`:", moyenne sur l'année"} : ils peuvent varier selon le magasin.
+          ${L.unknown?`${L.unknown} article${L.unknown>1?"s":""} sans prix connu.`:""} Glaçons et eau non comptés.</p>
+      </div>
+      <div class="panel">
+        <h3>🍽️ Au menu cette semaine</h3>
+        <div class="menu">
+          ${Object.keys(counts).map(id=>{ const r=R.find(x=>x.id===id); if(!r) return "";
+            return `<button data-open="${id}"><span class="dot" style="background:${grad(r)}">${r.emoji}</span><span>${r.nom}<small class="muted" style="display:block;font-weight:500;font-size:.72rem">🥤 Shakie · ${mine[id]?(mine[id]<counts[id]?"⭐ choisi + 🎲 hasard":"⭐ choisi"):"🎲 hasard"}</small></span>${counts[id]>1?`<span class="x">× ${counts[id]}</span>`:""}</button>`; }).join("")}
+          ${(w.cp||[]).map(id=>{ const r=ckGet(id); if(!r) return "";
+            return `<button data-open="${id}"><span class="dot" style="background:${ckGrad(r)}">${r.emoji}</span><span>${esc(ckShort(r.n))}<small class="muted" style="display:block;font-weight:500;font-size:.72rem">🍽️ Plat · ${(w.cfixed||[]).includes(id)?"⭐ choisi":"🎲 hasard"} · ⏱ ${ckTime(r.t)}</small></span></button>`; }).join("")}
+        </div>
+      </div>
+      <div class="row2"><button class="btn" id="genWeek">🎲 Autre liste</button></div>`;
+    }
+  }
+  const pick=state.pick, cpick=state.ckPick||[], pc={};
+  pick.forEach(id=>pc[id]=(pc[id]||0)+1);
+  const n=Math.min(12,Math.max(pick.length, w.n??3)), cn=state.ckN??3, ptab=state.ptab||(state.univers==="chef"?"ck":"sh");
+  return `
+  <div class="title"><h2>Courses de la semaine</h2></div>
+  <div class="panel" style="margin-top:0">
+    <div class="ctrl" style="margin-top:0"><label>⭐ Mes recettes <span class="muted" style="font-size:.78rem">${pick.length+cpick.length?(pick.length+cpick.length)+" choisie"+(pick.length+cpick.length>1?"s":""):"facultatif"}</span></label></div>
+    <div class="picked">
+      ${Object.keys(pc).map(id=>{ const r=R.find(x=>x.id===id); return r?`<button class="pchip" data-unpick="${id}" style="background:${grad(r)}">${r.emoji} ${r.nom}${pc[id]>1?` ×${pc[id]}`:""} <b>✕</b></button>`:""; }).join("")}
+      ${cpick.map(id=>{ const r=ckGet(id); return r?`<button class="pchip" data-ckunpick="${id}" style="background:${ckGrad(r)}">${r.emoji} ${esc(ckShort(r.n))} <b>✕</b></button>`:""; }).join("")}
+      <button class="pchip add" id="togglePicker">${state.picker?"✓ Terminé":"＋ Choisir"}</button></div>
+    ${state.picker?`<div class="picker">
+      <div class="size" style="margin-bottom:8px"><button data-ptab="sh" class="${ptab==="sh"?"on":""}">🥤 Shakies</button><button data-ptab="ck" class="${ptab==="ck"?"on":""}">🍽️ Plats</button></div>
+      <input id="pickSearch" class="search" type="search" placeholder="🔎 Chercher ${ptab==="ck"?"un plat":"un shakie"}…">
+      <div class="plist">${ptab==="ck"
+        ? ckData().map(r=>`<button class="prow" data-ckadd="${r.id}" data-s="${esc((r.n+" "+r.cu+" "+r.ingTxt).toLowerCase())}">
+            <span class="dot" style="background:${ckGrad(r)}">${r.emoji}</span><span class="pn">${esc(ckShort(r.n))}<small>${(CK_CUISINES[r.cu]||CK_CUISINES.Autre).icon} ${r.cu} · ⏱ ${ckTime(r.t)}</small></span>
+            <span class="pc">${cpick.includes(r.id)?"✓":""}</span><b>＋</b></button>`).join("")
+        : R.map(r=>`<button class="prow" data-add="${r.id}" data-s="${esc((r.nom+" "+r.ing.map(i=>i[2]).join(" ")).toLowerCase())}">
+            <span class="dot" style="background:${grad(r)}">${r.emoji}</span><span class="pn">${r.nom}<small>${TX[r.t].icon} ${TX[r.t].label}</small></span>
+            <span class="pc">${pc[r.id]?"×"+pc[r.id]:""}</span><b>＋</b></button>`).join("")}</div></div>`:""}
+    <div class="ctrl"><label>🥤 Shakies cette semaine <b id="nVal">${n}</b></label>
+      <input type="range" id="nRange" min="${pick.length}" max="12" step="1" value="${n}">
+      <div class="scale"><span id="mix">${mixLabel(n)}</span><span>12</span></div></div>
+    <div class="ctrl"><label>🍽️ Plats en plus au hasard <b id="ckVal">${cn}</b></label>
+      <input type="range" id="ckRange" min="0" max="7" step="1" value="${cn}">
+      <div class="scale"><span>${cpick.length?`⭐ ${cpick.length} choisi${cpick.length>1?"s":""} + 🎲 au hasard`:"🎲 au hasard"}</span><span>7</span></div></div>
+    <div class="ctrl"><label>Budget de la semaine <b id="bVal">${bLabel(w.budget)}</b></label>
+      <input type="range" id="bRange" min="5" max="81" step="1" value="${w.budget}"><div class="scale"><span>5 €</span><span>sans limite</span></div></div>
+    <div class="ctrl"><label>📍 Prix pour
+      <select id="region" class="sel">${Object.entries(REGIONS).map(([k,v])=>`<option value="${k}" ${k===state.region?"selected":""}>${v.nom}</option>`).join("")}</select></label></div>
+    <div class="size" style="margin-top:8px">
+      <button data-pmode="precis" class="${state.priceMode==="precis"?"on":""}">🎯 Précis (saison)</button>
+      <button data-pmode="moyen" class="${state.priceMode==="moyen"?"on":""}">📊 Moyen (volatile)</button>
+    </div>
+    <p class="muted" style="font-size:.8rem;margin:8px 0 12px">Choisis tes shakies et tes plats, le hasard complète avec des recettes qui réutilisent les mêmes ingrédients. Une seule liste pour tout.</p>
+    <button class="btn" id="genWeek" style="width:100%">${w.plan?"🔄 Refaire ma liste":"🎲 Générer ma liste"}</button>
+  </div>
+  ${res}`;
+}
+function mixLabel(n){
+  const k=state.pick.length, r=n-k;
+  if(!n) return "Pas de shakie cette semaine";
+  if(!k) return `🎲 ${n} au hasard`;
+  if(r<=0) return `⭐ ${k} choisi${k>1?"s":""}, rien au hasard`;
+  return `⭐ ${k} choisi${k>1?"s":""} + 🎲 ${r} au hasard`;
+}
+function genWeek(){
+  const w=shopDefaults(), fixed=state.pick.slice(), cfixed=[...new Set(state.ckPick||[])];
+  const n=Math.max(fixed.length, +($("#nRange")?.value ?? w.n)), b=+($("#bRange")?.value || w.budget);
+  const cn=+($("#ckRange")?.value ?? state.ckN ?? 3); state.ckN=cn; store.set("ckN",cn);
+  const budget=b>=81?Infinity:b;
+  // plats d'abord, puis les shakies avec le budget qui reste
+  let cp=pickDishes(cfixed, cn), dishCost=buildMerged([],cp).total;
+  while(cp.length>cfixed.length && dishCost>budget){ cp.pop(); dishCost=buildMerged([],cp).total; }
+  const g = n ? generateWeek(n, budget-dishCost, fixed) : {plan:[], reduced:false};
+  state.week={n,budget:b,plan:g.plan,reduced:g.reduced&&n>0,over:!!g.over||dishCost>budget,fixed,cp,cfixed,checked:[]};
+  state.picker=false;
+  store.set("week",state.week); render();
+}
+function addPick(id){ if(state.pick.length>=12) return false; state.pick.push(id); store.set("pick",state.pick); return true; }
+function unpick(id){ const i=state.pick.lastIndexOf(id); if(i>=0) state.pick.splice(i,1); store.set("pick",state.pick); }
+
+function shopExportBar(){
+  const w=state.week; if(!(w?.plan?.length || w?.cp?.length)) return "";
+  return `<div class="row2"><button class="btn alt" id="toggleExport" style="flex:1;font-size:1rem">${state.exOpen?"✕ Fermer l'export":"📤 Exporter ma liste"}</button></div>
+    ${state.exOpen?viewExport():""}`;
+}
+// Export : "simple" = une ligne par article (pour une appli de courses), "detail" = rayons, quantités, prix, menu
+function weekText(fmt=state.exFmt||"simple", onlyLeft=state.exLeft!==false){
+  const w=state.week; if(!w) return "";
+  const L=buildMerged(w.plan, w.cp), checked=w.checked||[];
+  const items=L.items.filter(i=>!(onlyLeft && checked.includes(i.k)));
+  if(fmt==="simple") return items.filter(i=>!i.staple).map(i=>i.qty?`${i.nom} (${i.qty})`:i.nom).join("\n");
+  const counts={}; w.plan.forEach(id=>counts[id]=(counts[id]||0)+1);
+  const shop=ALL_RAYONS.filter(r=>r!==CK_RAYONS[5]).map(ray=>{ const its=items.filter(i=>i.rayon===ray); if(!its.length) return "";
+    return `\n\n${ray}\n`+its.map(i=>`☐ ${i.nom}${i.qty?` — ${i.qty}`:""}${i.cost!=null?` (≈ ${eur(i.cost)})`:""}`).join("\n"); }).join("");
+  const pl=items.filter(i=>i.staple);
+  const menu=[...Object.keys(counts).map(id=>{const r=R.find(x=>x.id===id); return r?`• 🥤 ${r.nom}${counts[id]>1?" ×"+counts[id]:""}`:"";}),
+              ...(w.cp||[]).map(id=>`• 🍽️ ${ckShort(ckGet(id)?.n||"")}`)].filter(Boolean);
+  return `🛒 Courses de la semaine — ${w.plan.length+(w.cp||[]).length} recettes`+shop
+    +(pl.length?`\n\n🧂 À vérifier au placard\n`+pl.map(i=>"☐ "+i.nom).join("\n"):"")
+    +`\n\n💶 Total ≈ ${eur(L.total)}${state.priceMode==="moyen"?` (entre ${eur(L.lo)} et ${eur(L.hi)})`:""} · prix indicatifs, ${REGIONS[state.region].nom}`
+    +`\n\n🍽️ Au menu\n`+menu.join("\n");
+}
+function viewExport(){
+  const fmt=state.exFmt||"simple", left=state.exLeft!==false, canShare=!!(navigator.share||window.Android);
+  return `<div class="panel export">
+    <h3>📤 Exporter ma liste</h3>
+    <div class="size">
+      <button data-exfmt="simple" class="${fmt==="simple"?"on":""}">📝 Liste simple</button>
+      <button data-exfmt="detail" class="${fmt==="detail"?"on":""}">📋 Détaillée</button>
+    </div>
+    <p class="muted" style="font-size:.76rem;margin:4px 0 8px">${fmt==="simple"
+      ? "Un article par ligne : à coller dans Bring!, Listonic, Google Keep… chaque ligne devient un article."
+      : "Avec rayons, quantités, prix et les shakies au menu : parfait pour un message."}</p>
+    <label class="exleft"><input type="checkbox" id="exLeft" ${left?"checked":""}> Seulement ce qu'il reste à acheter</label>
+    <div class="exgrid">
+      ${canShare?`<button data-ex="share" class="exmain">📤 Partager…<small>Messenger, WhatsApp, appli de courses…</small></button>`:""}
+      <button data-ex="messenger">💬 Messenger</button>
+      <button data-ex="whatsapp">🟢 WhatsApp</button>
+      <button data-ex="sms">✉️ SMS</button>
+      <button data-ex="mail">📧 E-mail</button>
+      <button data-ex="copy">📋 Copier</button>
+      <button data-ex="file">💾 Fichier .txt</button>
+    </div>
+    <pre class="expre">${esc(weekText(fmt,left))}</pre>
+    <div class="exmsg" id="exMsg"></div>
+  </div>`;
+}
+function toast(msg){ const m=$("#exMsg"); if(m){ m.textContent=msg; clearTimeout(toast.t); toast.t=setTimeout(()=>m.textContent="",4000); } }
+async function copyText(txt){
+  try{ await navigator.clipboard.writeText(txt); return true; }
+  catch{ const ta=document.createElement("textarea"); ta.value=txt; document.body.appendChild(ta); ta.select();
+    let ok=false; try{ ok=document.execCommand("copy"); }catch{} ta.remove(); return ok; }
+}
+async function doExport(kind){
+  const txt=weekText(), title="Courses Shakies", enc=encodeURIComponent(txt);
+  const A=window.Android; // pont natif quand l'app tourne dans l'APK
+  if(A){
+    if(kind==="share") return A.share(txt);
+    if(kind==="messenger") return A.shareTo("com.facebook.orca", txt);
+    if(kind==="whatsapp") return A.shareTo("com.whatsapp", txt);
+    if(kind==="sms") return A.openUrl("sms:?body="+enc);
+    if(kind==="mail") return A.openUrl("mailto:?subject="+encodeURIComponent(title)+"&body="+enc);
+    if(kind==="copy"){ A.copy(txt); return toast("✅ Copié dans le presse-papiers."); }
+    if(kind==="file") return toast(A.saveText("courses-shakies.txt", txt));
+  }
+  if(kind==="share" || (kind==="messenger" && navigator.share)){
+    try{ await navigator.share({title, text:txt}); }catch(e){ if(e.name!=="AbortError") toast("Partage impossible ici, utilise « Copier »."); }
+    return;
+  }
+  if(kind==="messenger"){ // pas d'API texte pour Messenger sur ordinateur : on copie puis on ouvre Messenger
+    const ok=await copyText(txt); window.open("https://www.messenger.com/","_blank");
+    return toast(ok?"✅ Liste copiée : colle-la dans ta conversation Messenger.":"Copie impossible, sélectionne le texte ci-dessus.");
+  }
+  if(kind==="whatsapp") return void window.open("https://wa.me/?text="+enc,"_blank");
+  if(kind==="sms") return void (location.href="sms:?&body="+enc);
+  if(kind==="mail") return void (location.href="mailto:?subject="+encodeURIComponent(title)+"&body="+enc);
+  if(kind==="copy") return toast(await copyText(txt)?"✅ Copié dans le presse-papiers.":"Copie impossible, sélectionne le texte ci-dessus.");
+  if(kind==="file"){
+    const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([txt],{type:"text/plain;charset=utf-8"}));
+    a.download="courses-shakies.txt"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+    return toast("💾 Fichier courses-shakies.txt téléchargé.");
+  }
+}
+
+/* ---------- Recettes perso ---------- */
+store.get("custom",[]).forEach(r=>{ r.custom=true; R.push(r); });
+const saveCustom = () => store.set("custom", R.filter(r=>r.custom).map(({custom,...r})=>r));
+const UNITS = ["","g","ml","c. à c.","c. à s.","pincée","feuilles","cm","dose"];
+function guessLayer(n,u){
+  n=n.toLowerCase();
+  if(/glaçon|surgel|congel/.test(n)) return 5;
+  if(u==="feuilles"||/épinard|kale|menthe|basilic|feuille|salade|persil|coriandre/.test(n)) return 2;
+  if(/lait|jus|^eau|café|thé|yaourt|fromage|petit-suisse|boisson|kéfir|skyr/.test(n)||u==="ml") return 3;
+  if(/c\. à|pincée|dose|gouttes/.test(u)||/graine|poudre|beurre|miel|sirop|cacao|avoine|purée d'|sucre|épice|cannelle|protéine|datte|noix|pépites|vanille/.test(n)) return 4;
+  return 1;
+}
+function gOf(q,u,n){
+  if(u==="g"||u==="ml") return q;
+  if(u==="") return q*(/glaçon/.test(n)?25:/datte|letchi|litchi|figue|abricot|passion|kiwi|clémentine/.test(n)?40:120);
+  return q*({"c. à s.":15,"c. à c.":5,"feuilles":.5,"cm":5,"dose":30}[u]||0);
+}
+const PAL = [
+ [/fraise/,["#ffc2c7","#ff4d6d"],"🍓"],[/framboise/,["#ffd0dc","#e8336e"],"🍓"],[/myrtille/,["#c5d0ff","#4b5bd6"],"🫐"],
+ [/mûre|cassis|açaí/,["#d6b3e6","#5a1a6e"],"🫐"],[/cerise/,["#ffb3c1","#a4133c"],"🍒"],[/pitaya/,["#ffb3e6","#e0218a"],"🐉"],
+ [/pastèque/,["#ffc4c4","#ff4f62"],"🍉"],[/betterave|grenade|goyavier/,["#ff9fb2","#9d0b45"],"🔴"],[/mangue/,["#ffe08a","#ffa630"],"🥭"],
+ [/ananas/,["#fff5b0","#f6c90e"],"🍍"],[/papaye|carotte|orange|abricot|pêche|clémentine|nectarine/,["#ffd6a5","#ff8c42"],"🍊"],
+ [/passion/,["#ffe27a","#ff9f1c"],"🟡"],[/letchi|litchi|corossol/,["#fff3f0","#f7b2b7"],"🌸"],[/kiwi/,["#d6f5a0","#7bc950"],"🥝"],
+ [/épinard|kale|avocat|matcha|concombre/,["#d6f5b0","#4fae4f"],"🥬"],[/cacao|chocolat|café/,["#e0c3a0","#6b3e1f"],"🍫"],
+ [/cacahuète|datte|avoine/,["#f1d6a8","#b07d48"],"🥜"],[/banane/,["#fff4c2","#f2c94c"],"🍌"],[/pomme/,["#eaf7c8","#9ccc65"],"🍏"],
+ [/poire/,["#f5f0c8","#c9b458"],"🍐"],[/raisin/,["#d7c4ff","#6d3fc0"],"🍇"],[/melon/,["#fff0c2","#ffb26b"],"🍈"],[/coco/,["#fbf6ef","#d9c8b4"],"🥥"],
+];
+const TAGRULES = [
+ [/protéine|cacahuète|fromage blanc|yaourt grec|skyr/,"protéiné"],[/épinard|kale|avocat|matcha|concombre/,"vert"],
+ [/cacao|chocolat|datte|biscuit|caramel|pépites/,"gourmand"],[/cannelle|gingembre|curcuma|épices|cardamome|chai|piment|muscade/,"épicé"],
+ [/letchi|litchi|passion|goyavier|carambole|corossol|tamarin|vanille/,"péi"],[/avoine|chia|graines de lin/,"petit-déj"],[/café|matcha/,"énergie"],
+ [/fraise|framboise|mangue|ananas|pêche|cerise|myrtille|kiwi|melon|pastèque|abricot|raisin|papaye|mûre|cassis|pitaya/,"fruité"],
+];
+function analyse(ing){
+  let liquid=0, dairy=0, fresh=0, frozen=0, ice=0, thick=0, banana=false, best=null, bestW=0;
+  for(const [q0,u,n0] of ing){
+    const n=(n0||"").toLowerCase(), q=+q0||0; if(!n) continue;
+    const w=gOf(q,u,n), layer=guessLayer(n,u);
+    if(/banane/.test(n)) banana=true;
+    if(/glaçon/.test(n)) ice+=q;
+    else if(/surgel|congel/.test(n)) frozen+=w;
+    else if(/yaourt|fromage|petit-suisse|skyr/.test(n)){ dairy+=w; thick+=w*.5; }
+    else if(layer===3){ liquid+=w; if(/lait|coco/.test(n)) dairy+=w*.6; }
+    else if(/avoine|chia|beurre|purée d'|datte|avocat|protéine/.test(n)) thick+=w*(/avoine|chia/.test(n)?3:1.5);
+    else if(layer!==4) fresh+=w;
+    const p=PAL.find(([re])=>re.test(n));
+    const ww = layer===3 ? w*.4 : w;
+    if(p && ww>bestW){ bestW=ww; best=p; }
+  }
+  const t = knnTexture(features(ing));
+  const all=ing.map(i=>(i[2]||"").toLowerCase()).join(" ");
+  const tags=TAGRULES.filter(([re])=>re.test(all)).map(x=>x[1]).slice(0,3);
+  return {t, tags, c: best?best[1]:["#f6e7d8","#d8a47f"], emoji: best?best[2]:"🥤"};
+}
+// Détection du type : on compare la composition aux recettes de base les plus proches (k plus proches voisins)
+const WATERY=/pastèque|melon|ananas|orange|clémentine|pamplemousse|concombre|letchi|litchi|raisin|papaye|carambole|kiwi|fraise|citron|pêche|grenade|goyavier/;
+function features(ing){
+  const f=[0,0,0,0,0,0,0,0,0]; // fin, lait, yaourt, fruit juteux, fruit dense, surgelé, banane surgelée, glace, épaississant
+  for(const [q0,u,n0] of ing){
+    const n=(n0||"").toLowerCase(), q=+q0||0; if(!n) continue;
+    const w=gOf(q,u,n), layer=guessLayer(n,u);
+    if(/glaçon/.test(n)) f[7]+=q*25;
+    else if(/banane/.test(n) && /surgel|congel/.test(n)) f[6]+=w;
+    else if(/surgel|congel/.test(n)) f[5]+=w;
+    else if(/yaourt|fromage|petit-suisse|skyr/.test(n)) f[2]+=w;
+    else if(/lait|boisson/.test(n)) f[1]+=w;
+    else if(layer===3) f[0]+=w;
+    else if(/avoine|chia|beurre|purée d'|datte|protéine|cacao/.test(n)) f[8]+=w*(/avoine|chia/.test(n)?3:2);
+    else if(layer===4||layer===2) continue;
+    else if(WATERY.test(n)) f[3]+=w; else f[4]+=w;
+  }
+  const s=f.reduce((a,b)=>a+b,0)||1;
+  return f.map(x=>x/s);
+}
+let BASEF=null;
+function knnTexture(v, exceptId){
+  if(!BASEF) BASEF=R.filter(r=>!r.custom).map(r=>({id:r.id,t:r.t,f:features(r.ing)}));
+  const W=[1,1.2,1.2,1,1,1.2,1.3,1.5,1.3];
+  const d=BASEF.filter(b=>b.id!==exceptId).map(b=>({t:b.t,d:Math.sqrt(b.f.reduce((a,x,i)=>a+W[i]*(x-v[i])**2,0))})).sort((a,b)=>a.d-b.d).slice(0,5);
+  const score={}; d.forEach(x=>score[x.t]=(score[x.t]||0)+1/(x.d+.05));
+  return Object.entries(score).sort((a,b)=>b[1]-a[1])[0][0];
+}
+function keySet(ing){ return new Set(ing.map(i=>ingKey(i[2]||"")).filter(k=>k && !(CAT[k]&&CAT[k][1]===PL))); }
+function findSimilar(ing, exceptId){
+  const a=keySet(ing); if(a.size<2) return null;
+  let best=null;
+  for(const r of R){ if(r.id===exceptId) continue;
+    const b=keySet(r.ing); let inter=0; a.forEach(k=>{ if(b.has(k)) inter++; });
+    const j=inter/(a.size+b.size-inter);
+    if(!best||j>best.j) best={r,j};
+  }
+  return best && best.j>=.6 ? best : null;
+}
+function newDraft(){ return {nom:"",emoji:"🥤",emojiAuto:true,desc:"",tip:"",t:"cremeux",tAuto:true,tags:[],tagsAuto:true,
+  ing:[{q:1,u:"",n:""},{q:150,u:"ml",n:""},{q:4,u:"",n:"glaçons"}]}; }
+function draftIng(d){ return d.ing.filter(x=>x.n.trim()).map(x=>[x.q||1,x.u,x.n.trim(),guessLayer(x.n,x.u)]); }
+
+function viewCreate(){
+  const d=state.draft, names=[...new Set(R.flatMap(r=>r.ing.map(i=>i[2])))].sort();
+  const allTags=[...new Set(R.flatMap(r=>r.tags))];
+  return `
+  <div class="title"><h2>${d.id?"Modifier ma recette":"Nouvelle recette"}</h2></div>
+  <div class="panel" style="margin-top:0">
+    <label class="fl">Nom du shakie<input data-f="nom" value="${esc(d.nom)}" placeholder="ex : Mon Tropical Maison" maxlength="40"></label>
+    <label class="fl">Description <span class="muted">(facultatif)</span><input data-f="desc" value="${esc(d.desc)}" placeholder="En une phrase…" maxlength="90"></label>
+  </div>
+  <div class="panel">
+    <h3>Ingrédients <span class="muted" style="font:500 .75rem Inter">pour 1 gobelet 700 ml</span></h3>
+    ${d.ing.map((x,i)=>`<div class="irow">
+      <input data-row="${i}" data-k="q" type="number" inputmode="decimal" step="any" min="0" value="${x.q}">
+      <select data-row="${i}" data-k="u">${UNITS.map(u=>`<option value="${u}" ${u===x.u?"selected":""}>${u||"pièce"}</option>`).join("")}</select>
+      <input data-row="${i}" data-k="n" list="ingList" value="${esc(x.n)}" placeholder="ex : banane">
+      <button data-delrow="${i}" aria-label="Retirer">✕</button></div>`).join("")}
+    <datalist id="ingList">${names.map(n=>`<option value="${esc(n)}">`).join("")}</datalist>
+    <button class="pchip add" id="addRow" style="margin-top:4px">＋ Ajouter un ingrédient</button>
+    <p class="muted" style="font-size:.74rem;margin:8px 0 0">L'ordre de remplissage du gobelet sera calculé automatiquement.</p>
+  </div>
+  <div class="panel"><label class="fl" style="margin:0">Astuce <span class="muted">(facultatif)</span><input data-f="tip" value="${esc(d.tip)}" maxlength="120"></label></div>
+  <div class="panel">
+    <h3>Type de shakie</h3>
+    <div class="tprev">
+      <div class="cupwrap" id="pcup"></div>
+      <div style="flex:1;min-width:0">
+        <select data-f="t" class="tsel">${Object.entries(TX).map(([k,v])=>`<option value="${k}" ${k===d.t?"selected":""}>${v.icon} ${v.label}</option>`).join("")}</select>
+        <div class="auto" id="tAuto">${d.tAuto?"✨ détecté automatiquement":"✋ choisi par toi"}</div>
+        <div class="auto" id="bAuto" style="color:var(--muted)"></div>
+        <label class="fl">Emoji<input data-f="emoji" value="${esc(d.emoji)}" maxlength="4" style="width:70px;text-align:center;font-size:1.3rem"></label>
+      </div>
+    </div>
+    <div class="chips" id="tagChips" style="flex-wrap:wrap;margin:0;padding:8px 0 0">${allTags.map(t=>`<button class="chip ${d.tags.includes(t)?"on":""}" data-tagtoggle="${t}">${t}</button>`).join("")}</div>
+    <div id="dup"></div>
+  </div>
+  <div class="err" id="formErr"></div>
+  <button class="btn" id="saveRecipe" style="width:100%;margin-top:12px">💾 Enregistrer ma recette</button>`;
+}
+let lastPrev="";
+function updateDraftUI(){
+  const d=state.draft, ing=draftIng(d), an=analyse(ing);
+  if(d.tAuto){ d.t=an.t; const s=$('select[data-f="t"]'); if(s) s.value=d.t; }
+  if(d.emojiAuto){ d.emoji=an.emoji; const e=$('input[data-f="emoji"]'); if(e) e.value=d.emoji; }
+  if(d.tagsAuto){ d.tags=an.tags; }
+  d.c=an.c;
+  const ta=$("#tAuto"); if(ta) ta.textContent=d.tAuto?"✨ détecté automatiquement":"✋ choisi par toi";
+  const ba=$("#bAuto"); if(ba){ const b=BASES[baseOf({custom:true,ing:draftIng(d)})]; ba.textContent="Base : "+b.icon+" "+b.label; }
+  document.querySelectorAll("[data-tagtoggle]").forEach(b=>b.classList.toggle("on",d.tags.includes(b.dataset.tagtoggle)));
+  const sig=d.t+d.c.join(); const pc=$("#pcup");
+  if(pc && sig!==lastPrev){ lastPrev=sig; pc.innerHTML=cupSVG({id:"prev",nom:d.nom||"ma recette",t:d.t,c:d.c}); }
+  const sim=findSimilar(ing,d.id), box=$("#dup");
+  if(box) box.innerHTML = !sim ? "" : sim.j>=.999
+    ? `<div class="dup same">⚠️ Cette recette existe déjà : <b>${sim.r.emoji} ${sim.r.nom}</b> a exactement les mêmes ingrédients.<button data-open="${sim.r.id}">Voir</button></div>`
+    : `<div class="dup near">💡 Ça ressemble beaucoup à <b>${sim.r.emoji} ${sim.r.nom}</b> (${Math.round(sim.j*100)} % d'ingrédients en commun).<button data-open="${sim.r.id}">Voir</button></div>`;
+}
+function saveRecipe(){
+  const d=state.draft, ing=draftIng(d), err=$("#formErr");
+  if(!d.nom.trim()) return err.textContent="Donne un nom à ton shakie.";
+  if(ing.length<2) return err.textContent="Ajoute au moins 2 ingrédients.";
+  const sim=findSimilar(ing,d.id);
+  if(sim && sim.j>=.999 && !confirm(`Cette recette existe déjà (${sim.r.nom}). L'enregistrer quand même ?`)) return;
+  const an=analyse(ing), cl=s=>String(s).replace(/[<>"&]/g,"").trim();
+  const r={id:d.id||"perso-"+Date.now().toString(36), nom:cl(d.nom), emoji:cl(d.emoji)||an.emoji, c:an.c, t:d.t,
+    tags:d.tags.length?d.tags:["perso"], desc:cl(d.desc)||"Ma recette maison.", ing:ing.map(([q,u,n,l])=>[q,u,cl(n),l]),
+    tip:cl(d.tip)||"Recette maison : ajuste les quantités à ton goût !", custom:true};
+  const i=R.findIndex(x=>x.id===r.id);
+  if(i>=0) R[i]=r; else R.push(r);
+  delete NEED[r.id]; saveCustom();
+  state.draft=null; state.view="all"; state.filter="perso"; open(r.id);
+}
+function editRecipe(id){
+  const r=R.find(x=>x.id===id);
+  state.draft={id, nom:r.nom, emoji:r.emoji, emojiAuto:false, desc:r.desc, tip:r.tip, t:r.t, tAuto:false, tags:[...r.tags], tagsAuto:false,
+    ing:r.ing.map(([q,u,n])=>({q,u,n}))};
+  state.from="all"; go("create");
+}
+function deleteRecipe(id){
+  const r=R.find(x=>x.id===id);
+  if(!confirm(`Supprimer « ${r.nom} » ? Cette action est définitive.`)) return;
+  R.splice(R.indexOf(r),1); favs.delete(id); store.set("favs",[...favs]);
+  state.pick=state.pick.filter(x=>x!==id); store.set("pick",state.pick);
+  if(state.randomId===id) state.randomId=null;
+  saveCustom(); go("all");
+}
+
+/* ---------- Views ---------- */
+function pickRandom(){
+  let r; do { r = R[Math.floor(Math.random()*R.length)] } while (R.length>1 && r.id===state.randomId);
+  state.randomId = r.id;
+  // suggestions : même texture ou tag en commun d'abord
+  const others = R.filter(x=>x.id!==r.id).sort(()=>Math.random()-.5);
+  const near = others.filter(x=>x.t===r.t || x.tags.some(t=>r.tags.includes(t)));
+  state.picks = [...new Set([...near.slice(0,4),...others])].slice(0,6).map(x=>x.id);
+}
+const badge = r => `<span class="badge">${TX[r.t].icon} ${TX[r.t].label}</span>`;
+const baseBadge = r => { const b=BASES[baseOf(r)]; return `<span class="badge">${b.icon} ${b.label}</span>`; };
+
+function viewHome(){
+  if(!state.randomId) pickRandom();
+  const r = R.find(x=>x.id===state.randomId);
+  const enterNow = state.enter!==false; state.enter=false; // animation d'arrivée seulement au chargement et au changement de recette
+  const picks = state.picks.map(id=>R.find(x=>x.id===id));
+  return `<div class="home">
+    <section class="stage" style="--halo:${halo(r)}">
+      <div class="kicker">🎲 Le shakie du moment</div>
+      <button class="cupwrap" id="cup" aria-label="Changer de shakie">${cupSVG(r, enterNow)}</button>
+      <h1>${r.emoji} ${r.nom}</h1>
+      <p>${r.desc}</p>
+      <div class="badges">${badge(r)}${baseBadge(r)}<span class="badge">⚡ ${TX[r.t].prog}</span></div>
+      <div class="cta">
+        <button class="btn" data-open="${r.id}">Je le fais !</button>
+        <button class="btn alt" id="reroll" aria-label="Un autre">🎲</button>
+      </div>
+      <div class="hint">Touche le gobelet pour en changer</div>
+    </section>
+    <aside class="side ${state.side?"":"closed"}">
+      <button class="handle" id="toggleSide" aria-label="Ça pourrait te plaire"><b>›</b>${state.side?"":'<span class="vlabel">Ça pourrait te plaire</span>'}</button>
+      <div class="list">
+        ${picks.map(p=>`<button class="mini" data-open="${p.id}"><span class="dot" style="background:${grad(p)}">${p.emoji}</span>${p.nom}</button>`).join("")}
+      </div>
+    </aside>
+  </div>`;
+}
+
+function card(r){
+  return `<button class="card" data-open="${r.id}">
+    <div class="sw" style="background:${grad(r)}">${r.emoji}<span class="tx">${TX[r.t].icon}</span></div>
+    <h3>${favs.has(r.id)?"❤️ ":""}${r.custom?"⭐ ":""}${esc(r.nom)}</h3>
+    <div class="d">${r.desc}</div>
+  </button>`;
+}
+
+function viewList(onlyFavs){
+  if(TX[state.filter]){ state.texture=state.filter; state.filter="tous"; }
+  state.texture = state.texture || "tous";
+  const tastes = ["tous",...(R.some(r=>r.custom)?["perso"]:[]),...new Set(R.flatMap(r=>r.tags))];
+  const lbl = f => f==="tous" ? "Tous" : f==="perso" ? "⭐ Mes recettes" : f[0].toUpperCase()+f.slice(1);
+  let list = onlyFavs ? R.filter(r=>favs.has(r.id)) : R;
+  if(state.texture!=="tous") list = list.filter(r=>r.t===state.texture);
+  if(state.filter==="perso") list = list.filter(r=>r.custom);
+  else if(state.filter!=="tous") list = list.filter(r=>r.tags.includes(state.filter));
+  const q = state.q.trim().toLowerCase();
+  if(q) list = list.filter(r => (r.nom+" "+r.desc+" "+r.ing.map(i=>i[2]).join(" ")).toLowerCase().includes(q));
+  const usedBases = Object.keys(BASES).filter(b=>R.some(r=>baseOf(r)===b));
+  if(state.base!=="toutes") list = list.filter(r=>baseOf(r)===state.base);
+  return `
+  <div class="title"><h2>${onlyFavs?"Mes favoris":"Recettes"}</h2><span class="muted">${list.length} shakie${list.length>1?"s":""}</span></div>
+  ${onlyFavs?"":`<button class="btn" id="newRecipe" style="width:100%;margin-bottom:10px">＋ Créer ma recette</button>`}
+  <input id="search" class="search" type="search" placeholder="🔎 Un fruit, un nom… (ex : mangue)" value="${esc(state.q)}">
+  <div class="fpanel">
+    <div class="frow"><div class="flabel">Base</div>
+      <div class="scroller"><button class="arr l" data-arr="-1" aria-label="Précédent">‹</button><div class="chips">${["toutes",...usedBases].map(b=>`<button class="chip ${state.base===b?"on":""}" data-base="${b}">${b==="toutes"?"Toutes":BASES[b].icon+" "+BASE_SHORT[b]}</button>`).join("")}</div><button class="arr r" data-arr="1" aria-label="Suivant">›</button></div></div>
+    ${state.base==="vegetal"?`<p class="fnote">🌱 N'importe quel lait végétal marche : amande, avoine, soja, riz, noisette…</p>`:""}
+    <div class="frow"><div class="flabel">Consistance</div>
+      <div class="scroller"><button class="arr l" data-arr="-1" aria-label="Précédent">‹</button><div class="chips">${["tous",...Object.keys(TX)].map(t=>`<button class="chip ${state.texture===t?"on":""}" data-tex="${t}">${t==="tous"?"Toutes":TX[t].icon+" "+TX[t].label}</button>`).join("")}</div><button class="arr r" data-arr="1" aria-label="Suivant">›</button></div></div>
+    <div class="frow"><div class="flabel">Goût</div>
+      <div class="scroller"><button class="arr l" data-arr="-1" aria-label="Précédent">‹</button><div class="chips">${tastes.map(t=>`<button class="chip ${state.filter===t?"on":""}" data-tag="${t}">${lbl(t)}</button>`).join("")}</div><button class="arr r" data-arr="1" aria-label="Suivant">›</button></div></div>
+  </div>
+  ${list.length ? `<div class="grid">${list.map(card).join("")}</div>` :
+    `<div class="empty">${onlyFavs && !favs.size ? "Aucun favori pour l'instant.<br>Touche 🤍 sur une recette !" : "Aucun shakie ne correspond 🤷"}</div>`}`;
+}
+
+function viewDetail(id){
+  const r = R.find(x=>x.id===id);
+  const mult = state.size, T = TX[r.t];
+  const sorted = [...r.ing].sort((a,b)=>a[3]-b[3]);
+  const prog = mult===1 ? T.prog : "BLEND";
+  return `
+  <section class="dhero" style="--halo:${halo(r)}">
+    <div class="cupwrap">${cupSVG(r)}</div>
+    <div>
+      <h1>${r.nom}</h1>
+      <p>${r.desc}</p>
+      <div class="badges" style="justify-content:flex-start;margin:0">${badge(r)}${baseBadge(r)}
+        <button class="fav" id="fav">${favs.has(r.id)?"❤️ Favori":"🤍 Favori"}</button>
+        <button class="fav" data-add="${r.id}">${(()=>{const c=state.pick.filter(x=>x===r.id).length; return c?`🛒 Courses ×${c} ＋`:"🛒 + Courses";})()}</button>
+        ${r.custom?`<button class="fav" data-edit="${r.id}">✏️ Modifier</button><button class="fav" data-del="${r.id}">🗑️</button>`:""}</div>
+    </div>
+  </section>
+  <div class="panel">
+    <h3>Ingrédients</h3>
+    <div class="size">
+      <button data-size="1" class="${mult===1?"on":""}">Gobelet 700 ml</button>
+      <button data-size="2.5" class="${mult!==1?"on":""}">Bol 2,1 L (≈3 pers.)</button>
+    </div>
+    <p class="muted" style="font-size:.8rem;margin:6px 0 2px">${mult===1?"Dans l'ordre où les mettre":"Pour le bol : liquides d'abord"} — touche pour cocher.</p>
+    <ul class="ing">${(mult===1?sorted:[...sorted].sort((a,b)=>(a[3]===3?0:1)-(b[3]===3?0:1))).map(i=>`<li><span class="box">✓</span><span class="q">${qty(i[0],i[1],mult)}</span><span>${i[2]}</span><span class="layer">${L[i[3]]}</span></li>`).join("")}</ul>
+  </div>
+  <div class="panel">
+    <h3>Préparation</h3>
+    <div class="prep">
+      <div>Contenant<b>${mult===1?"Gobelet":"Bol 2,1 L"}</b></div>
+      <div>Programme<b>${prog}</b></div>
+      <div>Durée<b>≈ ${prog==="MAX BLEND"?"60":"45"} s</b></div>
+    </div>
+    <ol class="steps">
+      ${mult===1 ? `
+      <li>Remplis le gobelet <b>dans l'ordre de la liste</b> : frais → feuilles → liquides → extras → glacé.</li>
+      <li>Ne dépasse pas la ligne <b>MAX</b> du gobelet.</li>
+      <li>Visse la lame, retourne le gobelet et clipse-le sur la base.</li>
+      <li>Lance <b>${prog}</b> : le programme Auto-iQ s'arrête tout seul.</li>
+      <li>${r.t==="epais"?"Trop épais ? Ajoute 2–3 c. à s. de liquide et relance quelques <b>PULSE</b>.":r.t==="slushy"?"Pour plus de cristaux, arrête plus tôt et termine en <b>PULSE</b>.":"Trop épais ? Un trait de liquide et quelques <b>PULSE</b>."}</li>` : `
+      <li>Mets d'abord les <b>liquides</b> dans le bol, puis le frais et les feuilles, et la glace/surgelés en dernier.</li>
+      <li>Installe la lame, ferme et verrouille le couvercle.</li>
+      <li>Lance <b>BLEND</b> ; termine avec 2–3 <b>PULSE</b> s'il reste des morceaux.</li>
+      <li>Respecte la ligne <b>MAX</b> du bol.</li>`}
+      <li>Sers tout de suite, bien frais 🥤</li>
+    </ol>
+    <div class="tip">💡 ${r.tip}</div>
+  </div>`;
+}
+
+function render(){
+  document.querySelectorAll(".tabbar button").forEach(b=>b.classList.toggle("on", b.dataset.view===(state.view==="detail"?state.from:state.view)));
+  const chef = state.univers==="chef";
+  document.body.classList.toggle("u-chef", chef);
+  topEl.innerHTML = state.view==="create"
+    ? `<button class="back" id="back">← Annuler</button>`
+    : state.view==="detail"
+    ? `<button class="back" id="back">← Retour</button><button class="back" id="randomFromDetail" style="margin:0">🎲 Surprise</button>`
+    : `<div class="univ" role="tablist">
+        <button data-univ="shakies" class="${chef?"":"on"}">🥤 Shakies<small>${R.length}</small></button>
+        <button data-univ="chef" class="${chef?"on":""}">🍽️ Chef's Kiss<small>${ckData().length}</small></button></div>`;
+  if(state.view==="home") app.innerHTML = chef ? ckHome() : viewHome();
+  else if(state.view==="all") app.innerHTML = chef ? ckList(false) : viewList(false);
+  else if(state.view==="favs") app.innerHTML = chef ? ckList(true) : viewList(true);
+  else if(state.view==="shop") app.innerHTML = viewShop() + shopExportBar();
+  else if(state.view==="create"){ app.innerHTML = viewCreate(); lastPrev=""; updateDraftUI(); }
+  else app.innerHTML = isCK(state.id) ? ckDetail(state.id) : viewDetail(state.id);
+  const ckr=$("#ckRange"); if(ckr) ckr.addEventListener("input", ()=>{ $("#ckVal").textContent=ckr.value; });
+  const cps=$("#ckPickSearch");
+  if(cps) cps.addEventListener("input", ()=>{ const q=cps.value.trim().toLowerCase();
+    document.querySelectorAll(".prow[data-ckadd]").forEach(b=>b.style.display = !q || b.dataset.s.includes(q) ? "" : "none"); });
+  const s = $("#search");
+  if(s) s.addEventListener("input", e=>{ state.q=e.target.value; const pos=e.target.selectionStart; render(); const n=$("#search"); n.focus(); n.setSelectionRange(pos,pos); });
+  const nr=$("#nRange"), br=$("#bRange");
+  if(nr) nr.addEventListener("input", ()=>{ $("#nVal").textContent=nr.value; $("#mix").textContent=mixLabel(+nr.value); });
+  const rg=$("#region");
+  if(rg) rg.addEventListener("change", ()=>{ state.region=rg.value; store.set("region",state.region); priceMemo={}; render(); });
+  const ps=$("#pickSearch");
+  if(ps) ps.addEventListener("input", ()=>{ const q=ps.value.trim().toLowerCase(); state.pq=ps.value;
+    document.querySelectorAll(".prow").forEach(b=>b.style.display = !q || b.dataset.s.includes(q) ? "" : "none"); });
+  if(br) br.addEventListener("input", ()=>{ $("#bVal").textContent= +br.value>=81 ? "Sans limite" : br.value+" €"; });
+  setupScrollers();
+  const xl=$("#exLeft");
+  if(xl) xl.addEventListener("change", ()=>{ state.exLeft=xl.checked; const y=scrollY; render(); scrollTo(0,y); });
+}
+
+// Rangées de filtres : flèches visibles seulement s'il reste des choix cachés de ce côté
+function setupScrollers(){
+  document.querySelectorAll(".scroller").forEach(sc=>{
+    const c=sc.querySelector(".chips");
+    const upd=()=>{ const over=c.scrollWidth>c.clientWidth+2;
+      sc.classList.toggle("can-l", over && c.scrollLeft>4);
+      sc.classList.toggle("can-r", over && c.scrollLeft+c.clientWidth<c.scrollWidth-4); };
+    const on=c.querySelector(".on");
+    if(on && on.offsetLeft+on.offsetWidth>c.clientWidth-40){
+      c.style.scrollBehavior="auto"; c.scrollLeft=on.offsetLeft-c.clientWidth/2+on.offsetWidth/2; c.style.scrollBehavior=""; }
+    c.addEventListener("scroll",upd,{passive:true}); upd();
+  });
+}
+window.addEventListener("resize", ()=>document.querySelectorAll(".scroller .chips").forEach(c=>c.dispatchEvent(new Event("scroll"))));
+
+function go(view){ state.view=view; window.scrollTo({top:0}); render(); }
+function open(id){ if(state.view!=="detail") state.from=state.view; state.id=id; state.size=1; go("detail"); }
+function reroll(){ state.enter=true; state.univers==="chef" ? ckPickRandom() : pickRandom(); render(); }
+
+document.addEventListener("click", e=>{
+  const t = e.target.closest("button, .ing li");
+  if(!t) return;
+  if(t.dataset.shop){ const c=state.week.checked, i=c.indexOf(t.dataset.shop); i<0?c.push(t.dataset.shop):c.splice(i,1); store.set("week",state.week); t.classList.toggle("done"); const pre=$(".expre"); if(pre) pre.textContent=weekText(); return; }
+  /* --- univers & Chef's Kiss --- */
+  if(t.dataset.univ){ if(state.univers!==t.dataset.univ){ state.univers=t.dataset.univ; store.set("univers",state.univers); state.q=""; state.enter=true; window.scrollTo({top:0}); render(); } return; }
+  if(t.dataset.ckf){ const [k,v]=t.dataset.ckf.split(":"); state.ckf[k]=v; state.ckLimit=60; return render(); }
+  if(t.id==="ckMore"){ state.ckLimit=(state.ckLimit||60)+60; const y=scrollY; render(); return scrollTo(0,y); }
+  if(t.dataset.ckadd){ const id=t.dataset.ckadd, p=state.ckPick, i=p.indexOf(id);
+    if(state.view==="detail"){ i<0?p.push(id):p.splice(i,1); store.set("ckpick",p); return render(); }
+    if(i<0) p.push(id); store.set("ckpick",p); const sc=$(".plist")?.scrollTop||0, q=$("#pickSearch")?.value||""; render();
+    const ps=$("#pickSearch"); if(ps&&q){ ps.value=q; ps.dispatchEvent(new Event("input")); } const pl=$(".plist"); if(pl) pl.scrollTop=sc; return; }
+  if(t.dataset.ckunpick){ state.ckPick=state.ckPick.filter(x=>x!==t.dataset.ckunpick); store.set("ckpick",state.ckPick); return render(); }
+  if(t.matches(".ing li")) return t.classList.toggle("done");
+  if(t.dataset.add){
+    if(state.view==="detail"){ addPick(t.dataset.add); return render(); }
+    const sc=$(".plist")?.scrollTop||0, q=state.pq||"";
+    if(state.week) state.week.n=Math.max(state.week.n||0, state.pick.length+1);
+    addPick(t.dataset.add); render();
+    const pl=$(".plist"), ps=$("#pickSearch");
+    if(ps && q){ ps.value=q; ps.dispatchEvent(new Event("input")); }
+    if(pl) pl.scrollTop=sc; return;
+  }
+  if(t.dataset.pmode){ state.priceMode=t.dataset.pmode; store.set("priceMode",state.priceMode); priceMemo={}; return render(); }
+  if(t.id==="newRecipe"){ state.draft=newDraft(); state.from="all"; return go("create"); }
+  if(t.id==="addRow"){ state.draft.ing.push({q:1,u:"",n:""}); render(); const ins=document.querySelectorAll('[data-k="n"]'); return ins[ins.length-1]?.focus(); }
+  if(t.dataset.delrow){ state.draft.ing.splice(+t.dataset.delrow,1); return render(); }
+  if(t.dataset.tagtoggle){ const d=state.draft, g=t.dataset.tagtoggle; d.tagsAuto=false; d.tags=d.tags.includes(g)?d.tags.filter(x=>x!==g):[...d.tags,g]; return updateDraftUI(); }
+  if(t.id==="saveRecipe") return saveRecipe();
+  if(t.dataset.edit) return editRecipe(t.dataset.edit);
+  if(t.dataset.del) return deleteRecipe(t.dataset.del);
+  if(t.dataset.unpick){ unpick(t.dataset.unpick); return render(); }
+  if(t.dataset.arr){ const c=t.parentElement.querySelector(".chips"); return c.scrollBy({left:+t.dataset.arr*c.clientWidth*.7}); }
+  if(t.dataset.tex){ state.texture=t.dataset.tex; return render(); }
+  if(t.id==="togglePicker"){ state.picker=!state.picker; state.pq=""; return render(); }
+  if(t.dataset.ptab){ state.ptab=t.dataset.ptab; state.pq=""; return render(); }
+  if(t.id==="genWeek"){ t.textContent="⏳ Je cherche…"; return setTimeout(genWeek,30); }
+  if(t.id==="toggleExport"){ state.exOpen=!state.exOpen; render(); const ex=$(".export"); if(ex) ex.scrollIntoView({behavior:"smooth",block:"start"}); return; }
+  if(t.dataset.exfmt){ state.exFmt=t.dataset.exfmt; store.set("exFmt",state.exFmt); const y=scrollY; render(); return scrollTo(0,y); }
+  if(t.dataset.ex) return doExport(t.dataset.ex);
+  if(t.dataset.view){ state.filter="tous"; go(t.dataset.view); }
+  else if(t.dataset.open) open(t.dataset.open);
+  else if(t.dataset.tag){ state.filter=t.dataset.tag; render(); }
+  else if(t.dataset.base){ state.base=t.dataset.base; render(); }
+  else if(t.dataset.size){ state.size=+t.dataset.size; render(); }
+  else if(t.id==="reroll"||t.id==="cup") reroll();
+  else if(t.id==="toggleSide"){ state.side=!state.side; store.set("side",state.side); render(); }
+  else if(t.id==="randomFromDetail"){ if(isCK(state.id)){ ckPickRandom(); state.id=state.ckRandom; } else { pickRandom(); state.id=state.randomId; } state.size=1; window.scrollTo({top:0}); render(); }
+  else if(t.id==="back") go(state.from||"home");
+  else if(t.id==="fav"){ favs.has(state.id)?favs.delete(state.id):favs.add(state.id); store.set("favs",[...favs]); render(); }
+});
+
+// Formulaire de recette perso
+document.addEventListener("input", e=>{
+  if(state.view!=="create"||!state.draft) return;
+  const el=e.target, d=state.draft;
+  if(el.dataset.f){ d[el.dataset.f]=el.value; if(el.dataset.f==="t") d.tAuto=false; if(el.dataset.f==="emoji") d.emojiAuto=false; }
+  else if(el.dataset.row!==undefined){ const x=d.ing[+el.dataset.row]; const k=el.dataset.k;
+    x[k] = k==="q" ? (parseFloat(String(el.value).replace(",","."))||0) : el.value; }
+  else return;
+  updateDraftUI();
+});
+
+// Bouton retour Android : revient en arrière dans l'app avant de la quitter
+window.appBack = () => {
+  if(state.view==="detail"||state.view==="create"){ go(state.from||"home"); return true; }
+  if(state.view!=="home"){ go("home"); return true; }
+  return false;
+};
+
+// secouer le téléphone = nouveau shakie
+let lastShake=0;
+window.addEventListener("devicemotion", e=>{
+  const a=e.accelerationIncludingGravity; if(!a||state.view!=="home") return;
+  const f=Math.abs(a.x||0)+Math.abs(a.y||0)+Math.abs(a.z||0);
+  if(f>38 && Date.now()-lastShake>1200){ lastShake=Date.now(); reroll(); }
+});
+
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+  navigator.serviceWorker.register("sw.js").catch(()=>{});
+}
+render();
+</script>
+</body>
+</html>

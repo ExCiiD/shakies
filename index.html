@@ -721,7 +721,7 @@ const store = {
   set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)) }catch{} }
 };
 let favs = new Set(store.get("favs",[]));
-let state = {view:"home", univers:store.get("univers","shakies"), ckPick:store.get("ckpick",[]), ckWeek:store.get("ckweek",null), ckN:store.get("ckN",3), ckf:{ty:"tous",cu:"toutes",di:"toutes",m:"toutes"}, randomId:null, picks:[], filter:"tous", base:"toutes", q:"", size:1, side:store.get("side",true), from:"home", week:store.get("week",null), pick:store.get("pick",[]), picker:false, region:store.get("region","reunion"), priceMode:store.get("priceMode","precis"), exFmt:store.get("exFmt","simple")};
+let state = {view:"home", univers:store.get("univers","shakies"), ckPick:store.get("ckpick",[]), ckWeek:store.get("ckweek",null), ckN:store.get("ckN",3), ckf:{}, randomId:null, picks:[], filter:"tous", base:"toutes", q:"", size:1, side:store.get("side",true), from:"home", week:store.get("week",null), pick:store.get("pick",[]), picker:false, region:store.get("region","reunion"), priceMode:store.get("priceMode","precis"), exFmt:store.get("exFmt","simple")};
 
 function frac(n){
   const map={0.25:"¼",0.5:"½",0.75:"¾",1.25:"1¼",1.5:"1½",1.75:"1¾",2.5:"2½",3.75:"3¾"};
@@ -1602,7 +1602,9 @@ function setupScrollers(){
 window.addEventListener("resize", ()=>document.querySelectorAll(".scroller .chips").forEach(c=>c.dispatchEvent(new Event("scroll"))));
 
 function go(view){ state.view=view; window.scrollTo({top:0}); render(); }
-function open(id){ if(state.view!=="detail") state.from=state.view; state.id=id; state.size=1; go("detail"); }
+function open(id){ if(state.view!=="detail"){ state.from=state.view; state.listY=(state.view==="all"||state.view==="favs")?scrollY:null; } state.id=id; state.size=1; go("detail"); }
+// Retour : on revient à la liste exactement là où était la recette cliquée
+function goBack(){ const to=state.from||"home"; state.view=to; render(); const y=(to==="all"||to==="favs")?state.listY:null; scrollTo(0, y!=null ? y : 0); }
 function reroll(){ state.enter=true; state.univers==="chef" ? ckPickRandom() : pickRandom(); render(); }
 
 document.addEventListener("click", e=>{
@@ -1611,7 +1613,7 @@ document.addEventListener("click", e=>{
   if(t.dataset.shop){ const c=state.week.checked, i=c.indexOf(t.dataset.shop); i<0?c.push(t.dataset.shop):c.splice(i,1); store.set("week",state.week); t.classList.toggle("done"); const pre=$(".expre"); if(pre) pre.textContent=weekText(); return; }
   /* --- univers & Chef's Kiss --- */
   if(t.dataset.univ){ if(state.univers!==t.dataset.univ){ state.univers=t.dataset.univ; store.set("univers",state.univers); state.q=""; state.enter=true; window.scrollTo({top:0}); render(); } return; }
-  if(t.dataset.ckf){ const [k,v]=t.dataset.ckf.split(":"); state.ckf[k]=v; state.ckLimit=60; return render(); }
+  if(t.dataset.ckf){ const [k,v]=t.dataset.ckf.split(":"); state.ckf[k]=v; if(k==="grp") state.ckf.sub="tous"; state.ckLimit=60; return render(); }
   if(t.id==="ckMore"){ state.ckLimit=(state.ckLimit||60)+60; const y=scrollY; render(); return scrollTo(0,y); }
   if(t.dataset.ckadd){ const id=t.dataset.ckadd, p=state.ckPick, i=p.indexOf(id);
     if(state.view==="detail"){ i<0?p.push(id):p.splice(i,1); store.set("ckpick",p); return render(); }
@@ -1653,7 +1655,7 @@ document.addEventListener("click", e=>{
   else if(t.id==="reroll"||t.id==="cup") reroll();
   else if(t.id==="toggleSide"){ state.side=!state.side; store.set("side",state.side); render(); }
   else if(t.id==="randomFromDetail"){ if(isCK(state.id)){ ckPickRandom(); state.id=state.ckRandom; } else { pickRandom(); state.id=state.randomId; } state.size=1; window.scrollTo({top:0}); render(); }
-  else if(t.id==="back") go(state.from||"home");
+  else if(t.id==="back") goBack();
   else if(t.id==="fav"){ favs.has(state.id)?favs.delete(state.id):favs.add(state.id); store.set("favs",[...favs]); render(); }
 });
 
@@ -1670,7 +1672,7 @@ document.addEventListener("input", e=>{
 
 // Bouton retour Android : revient en arrière dans l'app avant de la quitter
 window.appBack = () => {
-  if(state.view==="detail"||state.view==="create"){ go(state.from||"home"); return true; }
+  if(state.view==="detail"||state.view==="create"){ goBack(); return true; }
   if(state.view!=="home"){ go("home"); return true; }
   return false;
 };

@@ -5,14 +5,73 @@
    Les données viennent de chefskiss-data.js (window.CK).
    ============================================================ */
 
-const CK_TYPES = {
-  Meal:     {label:"Plats",           one:"Plat",            icon:"🍲"},
-  Snack:    {label:"Snacks",          one:"Snack",           icon:"🥟"},
-  Dessert:  {label:"Desserts",        one:"Dessert",         icon:"🍰"},
-  Breakfast:{label:"Petit-déj",       one:"Petit-déj",       icon:"🥞"},
-  Side:     {label:"Accompagnements", one:"Accompagnement",  icon:"🥗"},
-  Sauce:    {label:"Sauces",          one:"Sauce",           icon:"🫙"},
+const CK_TYPES = { // types d'origine (servent seulement à choisir l'illustration)
+  Meal:{icon:"🍲"}, Snack:{icon:"🥟"}, Dessert:{icon:"🍰"}, Breakfast:{icon:"🥞"}, Side:{icon:"🥗"}, Sauce:{icon:"🫙"},
 };
+
+/* ---------- Classement : groupes et sous-types ---------- */
+// Chaque groupe : [libellé, icône, singulier, sous-types [clé, libellé, icône, regex sur le nom]] ; le dernier sous-type sans regex = « autres »
+const CK_GROUPS = {
+  plat:  ["Plats","🍲","Plat",[
+    ["soupe","Soupes","🍜",/soupe|velout|bouillon|potage|ramen|ph[ởo]\b|pho |laksa|minestrone|gaspacho|gazpacho|borscht|congee|jook|pozole|ribollita|bouillabaisse|miso|tom yum|tom kha|[cç]orbas|ajo blanco|pasta e fagioli|consomm/i],
+    ["fastfood","Fast food","🍔",/burger|sandwich|b[aá]nh m[iì]|croque|hot.?dog|kebab|shawarma|gyros|souvlaki|wrap|tacos?\b|taco |birria|burrito|quesadill|nacho|fajita|enchilad|tostada|taquito|flauta|pizza|calzone|pide|piadina|panini|bagnat|arepa|poutine|sabich|arayes|chicken|karaage|g[eé]n[eé]ral tao|cordon bleu|katsu sando|fish|nuggets|chilaquiles/i],
+    ["pates","Pâtes","🍝",/p[aâ]tes|pasta|spaghett|lasagn|penne|fettucc|tagliatell|linguine|bucatini|pappardelle|macaroni|ravioli|gnocchi|gnudi|cannelloni|tortellini|orecchiette|rigatoni|cacio|carbonara|bolognese|amatriciana|puttanesca|arrabbiata|alfredo|pastitsio|mac ?(&|and|n) ?cheese|ravioles/i],
+    ["nouilles","Nouilles","🥢",/nouille|noodle|udon|soba|yakisoba|japchae|pad thai|pad see|bo bun|vermicelle|mian\b|dan dan|chow mein|lo mein|tteokbokki|biang/i],
+    ["riz","Riz","🍚",/\briz\b|risotto|paella|bibimbap|nasi|donburi|katsudon|oyakodon|pilaf|koshari|mjadra|biryani|kare raisu|onigiri|sushi|kimbap|poke|fried rice|khao|spanakorizo/i],
+    ["mijote","Curry & mijotés","🍛",/curry|masala|korma|tikka|massaman|panang|phanaeng|\bdal\b|dahl|chana|aloo gobi|tajine|tagine|bourguignon|blanquette|daube|rago[uû]t|mijot|chili|cassoulet|navarin|osso|carbonnade|stroganoff|goulash|coq au vin|rougail|yassa|mole\b|barbacoa|cochinita|carnitas|couscous|choucroute|pot-au-feu|fricass|basquaise|brais|confit|kleftiko|foul|fasolakia|briam|ratatouille|caponata|imam|shakshuka|chakchouka|mapo|porc au caramel|thit kho|bœuf aux carottes|boeuf aux carottes|lathera/i],
+    ["four","Gratins & tartes","🧀",/gratin|parmentier|moussaka|quiche|tarte|tourte|souffl|tartiflette|flammekueche|pissaladi|aligot|parmigiana|endives|tian|r[oô]ti|en crapaudine|lasagnes v|fondue|raclette|fondant sal/i],
+    ["salade","Salades & bowls","🥗",/salade|bowl|tabou|fattoush|caprese|ceviche|aguachile|tartare|carpaccio|tataki|gado|som tum|ni[cç]oise|panzanella|vitello|esquites|goma-ae/i],
+    ["oeufs","Œufs","🍳",/(^|[^b])[oœ]uf|omelette|huevos|tamagoyaki|frittata|kuku|brouillade|tortilla de patatas|brik/i],
+    ["galette","Galettes & farcis","🫓",/galette|cr[eê]pe|jianbing|man.ouch|b[aá]nh x[eè]o|farci|mahshi|chiles|dolma|fatteh|rouleaux|bharta/i],
+    ["viande","Viandes & poissons","🍗",/fritto|brochette|kefta|steak|escalope|c[oô]te|grill|plancha|teriyaki|tonkatsu|cotoletta|milanese|saltimbocca|piccata|meuni[eè]re|moules|crevette|gambas|poisson|saumon|thon|cabillaud|sole|poulet|b[oœ]uf|porc|canard|agneau|veau|tandoori|bulgogi|yakitori|satay|chich|polpette|keftedes|boulettes|laqu[eé]|kung pao|gong bao|aigre-doux|sweet and sour|tofu|seitan|tempeh/i],
+    ["autre","Autres plats","🍽️"]]],
+  snack: ["Snacks & entrées","🥟","Snack",[
+    ["vapeur","Bao, raviolis & dim sum","🥟",/gyoza|wonton|dim sum|siu mai|har gow|jiaozi|xiao long|\bbao\b|baozi|\bpao\b|raviol|dumpling|manti|b[aá]nh cu[oố]n|b[aá]nh bao|zongzi|momo|shish barak/i],
+    ["friture","Fritures & beignets","🍤",/nems?\b|samosa|beignet|bhaji|croquet|korokke|arancini|suppl[iì]|falafel|tempura|takoyaki|wu gok|pakora|fritto|ebi fry|tofu tod|chả giò|cigare|frites|patatas|batata|aloo tikki|kibbeh|wings|ailes/i],
+    ["feuillete","Feuilletés & galettes","🥙",/b[öo]rek|chausson|empanada|tiropita|spanakopita|feuillet|galette|cr[eê]pe|pancake|okonomiyaki|jianbing|cong you|g[öo]zleme|man.ouch|fatayer|quesadilla|arepa|b[aá]nh x[eè]o|b[aá]nh kh[oọ]t|karipap|goug[eè]re|p[aã]o de queijo|naan|socca|pide|blini|kartoffelpuffer|gui cai|humitas|tamales/i],
+    ["dip","Dips & tartinades","🥣",/houmous|hummus|baba|tzatziki|guacamole|\bdip\b|tapenade|tarama|labneh|muhammara|caviar|ktipiti|tirokafteri|skordalia|queso|melitzano|zaalouk|pico de gallo|salsa|trempette/i],
+    ["street","Street food & sandwichs","🌯",/croque|b[aá]nh m[iì]|nachos|tostada|taquito|arayes|sandwich|bruschetta|toast|elotes|yakitori|satay|brochette|tteokkochi|karaage|dakgangjeong|chicken|wings|saganaki|halloumi|pissaladi|focaccia|pizza|tacos|hot.?dog|yakisoba/i],
+    ["froid","Rouleaux & bouchées froides","🍙",/rouleaux|tamagoyaki|onigiri|kimbap|gimmari|maki|sushi|ceviche|tartare|edamame|crackers|chips|pois chiches r[oô]tis|tofu|concombre/i],
+    ["autre","Autres snacks","🥨"]]],
+  sucre: ["Sucré","🍰","Sucré",[
+    ["gateaux","Gâteaux & biscuits","🎂",/g[aâ]teau|cake|cheesecake|brownie|cookie|clafoutis|fondant|biscuit|sabl[eé]|cantuccini|amaretti|langues? de chat|energy|barres?|truffe|halva|basbousa|namoura|tres leches|torta|crumble/i],
+    ["boulangerie","Boulangerie & petit-déj","🥐",/croissant|chocolatine|pain au|brioche|kouign|cinnamon|roul[eé]s|pain perdu|cr[eê]pe|gaufre|pancake|dorayaki|beignet|churros|loukoumad|zeppole|\bbao\b|\bpao\b|nai wong|muffin|chausson|bougatsa|granola|porridge|bowl|toast|tartine|bagel|scone|b[aá]nh bao/i],
+    ["patisserie","Pâtisserie","🧁",/tarte|tatin|macaron|[eé]clair|choux|paris-brest|profiterole|chouquette|mille-feuille|op[eé]ra|fraisier|entremets|trop[eé]zienne|baba|savarin|canel[eé]|financier|madeleine|cannoli|baklava|knafeh|galaktobour|past[eé]is|nata|dan tat|\bfar\b|pavlova|meringu|amandine|charlotte|b[uû]che|ma.amoul|portokalopita|torta della nonna|halawet/i],
+    ["cremes","Crèmes & desserts frais","🍮",/mousse|cr[eè]me|panna|pudding|riz au lait|flan|zabaione|sabayon|[iî]le flottante|affogato|sorbet|glace|verrine|chia|sago|tiramisu|mochi|tao sa|haricots rouges|sticky|perles|skyr|yaourt/i]]],
+  accomp:["Accompagnements","🥗","Accompagnement",[
+    ["pain","Pains","🥖",/pain|focaccia|naan|pita|ciabatta|bagel|piadina|brioche/i],
+    ["feculent","Féculents","🥔",/frites|pur[eé]e|riz|pommes? de terre|polenta|gratin dauphinois|aligot|patatas|sarladaise|gnocchi|semoule|boulgour|quinoa|lentilles|haricots|pois chiches|refritos/i],
+    ["dip","Dips & tartinades","🥣",/houmous|hummus|baba|tzatziki|guacamole|\bdip\b|tapenade|tarama|labneh|muhammara|caviar/i],
+    ["legume","Légumes & salades","🥦",/l[eé]gume|salade|taboul|gaspacho|gazpacho|dolma|blette|gratin|chou|kimchi|edamame|[eé]pinard|courgette|aubergine|haricots verts|carotte|brocoli|ratatouille|caponata|champignon|poivron|concombre/i],
+    ["autre","Autres","🍽️"]]],
+  sauce: ["Sauces","🫙","Sauce",[
+    ["dip","Dips & tartinades","🥣",/houmous|hummus|baba|tzatziki|guacamole|dip|tapenade|tarama|labneh|muhammara|caviar|ktipiti|tirokafteri|skordalia|queso|toum|a[iï]oli|melitzano|zaalouk|pico de gallo|crema/i],
+    ["huile","Huiles, pâtes & condiments","🌶️",/huile|oil|harissa|pesto|chili|piment|beurre|confit|kimchi|p[aâ]te|tao sa|ketchup|moutarde|macha/i],
+    ["sauce","Sauces","🫙"]]],
+};
+// ordre de recherche des sous-types (le premier qui correspond gagne) et sous-type par défaut
+const CK_MATCH = {sucre:{order:["patisserie","boulangerie","gateaux","cremes"], fallback:"gateaux"}};
+const CK_SWEET=/cookie|g[aâ]teaux?\b(?! de riz)|\bcake|muffins?\b(?! sal| anglais)|brownie|pancakes?\b(?! sal| japonais|\/pizza)|cr[eê]pes?\b(?! sal| compl| bretonne| sarrasin| forest| [aà] la ciboule| chinoise| vietnam| croustillante| turque)|gaufre|cantuccini|amaretti|langues? de chat|biscuit|sabl[eé]s|bougatsa|churros|beignets? (?!d.oignon)|loukoumad|energy|barres?|granola|porridge|chia|pudding|brioche(?!s? vapeur)|croissant|chocolat|cinnamon|kouign|pain perdu|dorayaki|mochi|tao sa|haricots rouges douce|sago|sticky|nai wong|confiture|caramel|baklava|halva|truffe|madeleine|financier|canel|chouquette|zeppole|knafeh|ma.amoul|basbousa|skyr bowl|pomme r[oô]tie|tiramisu|sorbet|panna|mousse|smoothie bowl/i;
+const CK_MEAT=/rag[uù]|bolognese|bolognaise|carbonara|amatriciana|poulet|volaille|b[oœ]uf|porc|veau|agneau|mouton|canard|dinde|lardon|jambon|bacon|saucisse|chorizo|guanciale|pancetta|prosciutto|salami|merguez|viande|hach[eé]|magret|g[eé]sier|foie|poisson|saumon|thon|cabillaud|crevette|gambas|moules?|palourde|vongole|calamar|poulpe|anchois|sardine|crabe|homard|fruits de mer|sauce (de )?poisson|nuoc|n[ưu][oớ]c m[aắ]m|fish sauce|hu[iî]tre|g[eé]latine|bouillon de (poulet|b[oœ]uf|volaille|viande)|fond de (veau|volaille)|tarama|[oœ]ufs de|bonite|dashi|katsuobushi|escargot|lapin|caille|char siu|saindoux|graisse (de canard|d.oie)|mo[eë]lle|kefta|chair|ribs|travers|oxtail|lamb|chicken|beef|pork|shrimp|bœuf|steak|escalope|côte|cuisse|pilon|blanc de/i;
+const CK_ANIMAL=/\blait\b(?! de coco| d.amande| d.avoine| de soja| de riz| v[eé]g[eé]tal| de noisette)|beurre(?! de cacahu| d.amande| de cajou| de noix| de s[eé]same)|cr[eè]me(?! de coco| v[eé]g[eé]tale| de soja)|fromage|yaourt|yogourt|[oœ]ufs?\b|jaunes? d|blancs? d|miel|mozzarella|parmesan|parmigiano|pecorino|feta|ricotta|mascarpone|ghee|paneer|halloumi|ch[eè]vre|cheddar|emmental|gruy|comt[eé]|skyr|lait concentr|cream cheese|labneh|burrata|gorgonzola|reblochon|raclette|ricotta|beurre clarifi/i;
+function ckClassify(r){
+  const title=r.n, ings=r.i.map(x=>x[0]).join(" | ");
+  let grp;
+  if(r.ty==="Dessert") grp="sucre";
+  else if(r.ty==="Sauce") grp="sauce";
+  else if(r.ty==="Side") grp=CK_SWEET.test(title)?"sucre":"accomp";
+  else if(r.ty==="Snack"||r.ty==="Breakfast") grp=CK_SWEET.test(title)?"sucre":(r.ty==="Snack"?"snack":"plat");
+  else grp=CK_SWEET.test(title)&&!/poulet|porc|b[oœ]uf/i.test(title)?"sucre":"plat";
+  const subs=CK_GROUPS[grp][3], rule=CK_MATCH[grp];
+  const ordered = rule ? rule.order.map(k=>subs.find(s=>s[0]===k)) : subs;
+  const hit = ordered.find(s=>s[3]&&s[3].test(title));
+  const sub = hit ? hit[0] : (rule ? rule.fallback : subs[subs.length-1][0]);
+  const vegTitle=/v[eé]g[eé]|vegan|chay\b|jay\b|sin carne/i.test(title);
+  const veg = vegTitle || !CK_MEAT.test(ings+" | "+title.replace(/\(.*?\)/g,""));
+  const vegan = veg && !CK_ANIMAL.test(ings);
+  return {grp, sub, veg, vegan};
+}
+const ckSubInfo = r => CK_GROUPS[r.grp][3].find(s=>s[0]===r.sub);
 const CK_CUISINES = {
   "Français":{icon:"🥖",c:["#dbe7ff","#3d5a9e"]}, "Italien":{icon:"🍝",c:["#e3f4d7","#c8372d"]},
   "Asiatique":{icon:"🥢",c:["#ffe1d6","#c0392b"]}, "Mexicain":{icon:"🌮",c:["#ffe8c2","#2f9e44"]},
@@ -64,7 +123,7 @@ function ckData(){
       : r.ty==="Dessert" ? "dessert"
       : (r.ty==="Snack" && /gyoza|wonton|dim sum|siu mai|har gow|jiaozi|xiao long|bao|pao|mochi|bánh bao|zongzi|dumpling/i.test(r.n)) ? "vapeur"
       : r.ty==="Breakfast" ? "assiette" : (r.ty==="Snack" ? "planche" : "assiette");
-    return {...r, cook:r.c, emoji:emo, c:food, kind, t:r.p+r.c, ingTxt:r.i.map(x=>x[0]).join(" ").toLowerCase()};
+    return {...r, ...ckClassify(r), cook:r.c, emoji:emo, c:food, kind, t:r.p+r.c, ingTxt:r.i.map(x=>x[0]).join(" ").toLowerCase()};
   });
   return CKD;
 }
@@ -160,8 +219,8 @@ function ckPickRandom(){
   do { r=D[Math.floor(Math.random()*D.length)]; } while(D.length>1 && r.id===state.ckRandom);
   state.ckRandom=r.id;
   const others=D.filter(x=>x.id!==r.id).sort(()=>Math.random()-.5);
-  const near=others.filter(x=>x.ty===r.ty && (x.cu===r.cu || x.m===r.m));
-  state.ckPicks=[...new Set([...near.slice(0,4),...others.filter(x=>x.ty===r.ty),...others])].slice(0,6).map(x=>x.id);
+  const near=others.filter(x=>x.grp===r.grp && x.sub===r.sub);
+  state.ckPicks=[...new Set([...near.slice(0,4),...others.filter(x=>x.grp===r.grp),...others])].slice(0,6).map(x=>x.id);
 }
 function ckBadges(r){
   const cu=CK_CUISINES[r.cu]||CK_CUISINES.Autre, d=CK_DIFF[r.di];
@@ -173,7 +232,7 @@ function ckHome(){
   const picks=(state.ckPicks||[]).map(ckGet).filter(Boolean);
   return `<div class="home">
     <section class="stage" style="--halo:${halo(r)}">
-      <div class="kicker">🎲 Le plat du moment · ${CK_TYPES[r.ty]?.one||""}</div>
+      <div class="kicker">🎲 Le plat du moment · ${ckSubInfo(r)[1]}</div>
       <button class="cupwrap platewrap" id="cup" aria-label="Changer de plat">${plateSVG(r, enterNow)}</button>
       <h1>${r.emoji} ${esc(ckShort(r.n))}</h1>${ckSub(r.n)?`<div class="ksub">${esc(ckSub(r.n))}</div>`:""}
       <p>${CK_COOK[r.m]||"🍽️"} ${esc(r.mr)}${r.op?" · 🫕 One pot":""} · ${r.i.length} ingrédients</p>
@@ -202,9 +261,12 @@ function ckCard(r){
 }
 const scrollRow = inner => `<div class="scroller"><button class="arr l" data-arr="-1" aria-label="Précédent">‹</button><div class="chips">${inner}</div><button class="arr r" data-arr="1" aria-label="Suivant">›</button></div>`;
 function ckList(onlyFavs){
-  const D=ckData(), f=state.ckf||(state.ckf={ty:"tous",cu:"toutes",di:"toutes",m:"toutes"});
+  const D=ckData(), f=state.ckf||(state.ckf={});
+  f.grp=f.grp||"tous"; f.sub=f.sub||"tous"; f.reg=f.reg||"tous"; f.cu=f.cu||"toutes"; f.di=f.di||"toutes"; f.m=f.m||"toutes";
   let list = onlyFavs ? D.filter(r=>favs.has(r.id)) : D;
-  if(f.ty!=="tous") list=list.filter(r=>r.ty===f.ty);
+  if(f.grp!=="tous") list=list.filter(r=>r.grp===f.grp);
+  if(f.grp!=="tous" && f.sub!=="tous") list=list.filter(r=>r.sub===f.sub);
+  if(f.reg==="veg") list=list.filter(r=>r.veg); else if(f.reg==="vegan") list=list.filter(r=>r.vegan);
   if(f.cu!=="toutes") list=list.filter(r=>r.cu===f.cu);
   if(f.di!=="toutes") list=list.filter(r=>r.di===f.di);
   if(f.m==="onepot") list=list.filter(r=>r.op); else if(f.m!=="toutes") list=list.filter(r=>r.m===f.m);
@@ -217,7 +279,9 @@ function ckList(onlyFavs){
   <div class="title"><h2>${onlyFavs?"Mes favoris":"Recettes"}</h2><span class="muted">${list.length} recette${list.length>1?"s":""}</span></div>
   <input id="search" class="search" type="search" placeholder="🔎 Un plat, un ingrédient… (ex : poulet, coco)" value="${esc(state.q)}">
   <div class="fpanel">
-    <div class="frow"><div class="flabel">Type</div>${scrollRow(chip("ty","tous","Tous")+Object.entries(CK_TYPES).map(([k,v])=>chip("ty",k,v.icon+" "+v.label)).join(""))}</div>
+    <div class="frow"><div class="flabel">Type</div>${scrollRow(chip("grp","tous","Tous")+Object.entries(CK_GROUPS).map(([k,g])=>chip("grp",k,g[1]+" "+g[0])).join(""))}</div>
+    ${f.grp!=="tous"?`<div class="frow"><div class="flabel">${CK_GROUPS[f.grp][0]}</div>${scrollRow(chip("sub","tous","Tous")+CK_GROUPS[f.grp][3].filter(s=>D.some(r=>r.grp===f.grp&&r.sub===s[0])).map(s=>chip("sub",s[0],s[2]+" "+s[1])).join(""))}</div>`:""}
+    <div class="frow"><div class="flabel">Régime</div>${scrollRow(chip("reg","tous","Tout")+chip("reg","veg","🌱 Végétarien")+chip("reg","vegan","🌿 Vegan"))}</div>
     <div class="frow"><div class="flabel">Cuisine</div>${scrollRow(chip("cu","toutes","Toutes")+cuisines.map(c=>chip("cu",c,CK_CUISINES[c].icon+" "+c)).join(""))}</div>
     <div class="frow"><div class="flabel">Difficulté</div>${scrollRow(chip("di","toutes","Toutes")+Object.entries(CK_DIFF).map(([k,v])=>chip("di",k,v.icon+" "+v.label)).join(""))}</div>
     <div class="frow"><div class="flabel">Cuisson</div>${scrollRow(chip("m","toutes","Toutes")+chip("m","onepot","🫕 One pot")+Object.entries(CK_COOK).filter(([k])=>D.some(r=>r.m===k)).map(([k,v])=>chip("m",k,v+" "+k)).join(""))}</div>
@@ -235,7 +299,7 @@ function ckDetail(id){
     <div class="cupwrap platewrap">${plateSVG(r)}</div>
     <div>
       <h1>${esc(r.n)}</h1>
-      <p>${CK_TYPES[r.ty]?.icon||""} ${CK_TYPES[r.ty]?.one||r.ty} · ${esc(r.ca)}</p>
+      <p>${ckSubInfo(r)[2]} ${CK_GROUPS[r.grp][2]} · ${ckSubInfo(r)[1]}${r.vegan?" · 🌿 Vegan":r.veg?" · 🌱 Végétarien":""}</p>
       <div class="badges" style="justify-content:flex-start;margin:0">${ckBadges(r)}
         <button class="fav" id="fav">${favs.has(r.id)?"❤️ Favori":"🤍 Favori"}</button>
         <button class="fav" data-ckadd="${r.id}">${inCourses?"🛒 Dans les courses ✓":"🛒 + Courses"}</button></div>
@@ -418,7 +482,7 @@ function buildMerged(shPlan, ckPlan){
 function pickDishes(fixed, extra){
   const D=ckData(), plan=[...fixed], keys=new Set(plan.flatMap(id=>ckGet(id).i.map(x=>ckNormItem(x[0]).toLowerCase())));
   for(let n=0;n<extra;n++){
-    const cand=D.filter(r=>!plan.includes(r.id)&&r.ty!=="Sauce").sort(()=>Math.random()-.5).slice(0,80)
+    const cand=D.filter(r=>!plan.includes(r.id)&&r.grp!=="sauce"&&r.grp!=="accomp").sort(()=>Math.random()-.5).slice(0,80)
       .map(r=>{ const its=r.i.map(x=>ckNormItem(x[0]).toLowerCase()); const shared=its.filter(k=>keys.has(k)).length;
         return [shared*2 - its.length*.35 + (r.di==="Rapide/Facile"?1:0) + Math.random()*1.5, r]; })
       .sort((a,b)=>b[0]-a[0]);

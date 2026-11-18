@@ -19,7 +19,7 @@ rm -rf "$OUT"; mkdir -p "$OUT/assets/www" "$OUT/classes" "$OUT/dex"
 cp -r "$HERE/src" "$HERE/res" "$HERE/AndroidManifest.xml" "$OUT/"
 
 # 1. l'app web devient les assets de l'APK
-cp "$ROOT/index.html" "$ROOT/chefskiss.js" "$ROOT/chefskiss-data.js" "$ROOT/icon.svg" "$ROOT/manifest.webmanifest" "$OUT/assets/www/"
+cp "$ROOT/index.html" "$ROOT/shakies-data2.js" "$ROOT/chefskiss-data2.js" "$ROOT/chefskiss.js" "$ROOT/chefskiss-data.js" "$ROOT/chefskiss-photos.js" "$ROOT/icon.svg" "$ROOT/manifest.webmanifest" "$OUT/assets/www/"
 
 # 2. ressources (icône adaptative) + manifeste
 "$BT/aapt2.exe" compile --dir "$(w "$OUT/res")" -o "$(w "$OUT/res.zip")"

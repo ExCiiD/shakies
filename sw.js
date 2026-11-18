@@ -1,6 +1,6 @@
 // Service worker : l'app marche hors-ligne une fois ouverte une première fois.
-const CACHE = "shakies-v10";
-const ASSETS = ["./", "./index.html", "./chefskiss.js", "./chefskiss-data.js", "./manifest.webmanifest", "./icon.svg"];
+const CACHE = "shakies-v12";
+const ASSETS = ["./", "./index.html", "./chefskiss.js", "./chefskiss-data.js", "./chefskiss-photos.js", "./shakies-data2.js", "./chefskiss-data2.js", "./manifest.webmanifest", "./icon.svg"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));

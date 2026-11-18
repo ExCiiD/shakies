@@ -13,13 +13,13 @@ const CK_TYPES = { // types d'origine (servent seulement à choisir l'illustrati
 // Chaque groupe : [libellé, icône, singulier, sous-types [clé, libellé, icône, regex sur le nom]] ; le dernier sous-type sans regex = « autres »
 const CK_GROUPS = {
   plat:  ["Plats","🍲","Plat",[
-    ["soupe","Soupes","🍜",/soupe|velout|bouillon|potage|ramen|ph[ởo]\b|pho |laksa|minestrone|gaspacho|gazpacho|borscht|congee|jook|pozole|ribollita|bouillabaisse|miso|tom yum|tom kha|[cç]orbas|ajo blanco|pasta e fagioli|consomm/i],
+    ["soupe","Soupes","🍜",/soupe|harira|velout|bouillon|potage|ramen|ph[ởo]\b|pho |laksa|minestrone|gaspacho|gazpacho|borscht|congee|jook|pozole|ribollita|bouillabaisse|miso|tom yum|tom kha|[cç]orbas|ajo blanco|pasta e fagioli|consomm/i],
     ["fastfood","Fast food","🍔",/burger|sandwich|b[aá]nh m[iì]|croque|hot.?dog|kebab|shawarma|gyros|souvlaki|wrap|tacos?\b|taco |birria|burrito|quesadill|nacho|fajita|enchilad|tostada|taquito|flauta|pizza|calzone|pide|piadina|panini|bagnat|arepa|poutine|sabich|arayes|chicken|karaage|g[eé]n[eé]ral tao|cordon bleu|katsu sando|fish|nuggets|chilaquiles/i],
-    ["pates","Pâtes","🍝",/p[aâ]tes|pasta|spaghett|lasagn|penne|fettucc|tagliatell|linguine|bucatini|pappardelle|macaroni|ravioli|gnocchi|gnudi|cannelloni|tortellini|orecchiette|rigatoni|cacio|carbonara|bolognese|amatriciana|puttanesca|arrabbiata|alfredo|pastitsio|mac ?(&|and|n) ?cheese|ravioles/i],
+    ["pates","Pâtes","🍝",/p[aâ]tes|pasta|conchiglion|spaghett|lasagn|penne|fettucc|tagliatell|linguine|bucatini|pappardelle|macaroni|ravioli|gnocchi|gnudi|cannelloni|tortellini|orecchiette|rigatoni|cacio|carbonara|bolognese|amatriciana|puttanesca|arrabbiata|alfredo|pastitsio|mac ?(&|and|n) ?cheese|ravioles/i],
     ["nouilles","Nouilles","🥢",/nouille|noodle|udon|soba|yakisoba|japchae|pad thai|pad see|bo bun|vermicelle|mian\b|dan dan|chow mein|lo mein|tteokbokki|biang/i],
     ["riz","Riz","🍚",/\briz\b|risotto|paella|bibimbap|nasi|donburi|katsudon|oyakodon|pilaf|koshari|mjadra|biryani|kare raisu|onigiri|sushi|kimbap|poke|fried rice|khao|spanakorizo/i],
-    ["mijote","Curry & mijotés","🍛",/curry|masala|korma|tikka|massaman|panang|phanaeng|\bdal\b|dahl|chana|aloo gobi|tajine|tagine|bourguignon|blanquette|daube|rago[uû]t|mijot|chili|cassoulet|navarin|osso|carbonnade|stroganoff|goulash|coq au vin|rougail|yassa|mole\b|barbacoa|cochinita|carnitas|couscous|choucroute|pot-au-feu|fricass|basquaise|brais|confit|kleftiko|foul|fasolakia|briam|ratatouille|caponata|imam|shakshuka|chakchouka|mapo|porc au caramel|thit kho|bœuf aux carottes|boeuf aux carottes|lathera/i],
-    ["four","Gratins & tartes","🧀",/gratin|parmentier|moussaka|quiche|tarte|tourte|souffl|tartiflette|flammekueche|pissaladi|aligot|parmigiana|endives|tian|r[oô]ti|en crapaudine|lasagnes v|fondue|raclette|fondant sal/i],
+    ["mijote","Curry & mijotés","🍛",/curry|saag|paneer|bhaji|gigantes|plaki|rajma|masala|korma|tikka|massaman|panang|phanaeng|\bdal\b|dahl|chana|aloo gobi|tajine|tagine|bourguignon|blanquette|daube|rago[uû]t|mijot|chili|cassoulet|navarin|osso|carbonnade|stroganoff|goulash|coq au vin|rougail|yassa|mole\b|barbacoa|cochinita|carnitas|couscous|choucroute|pot-au-feu|fricass|basquaise|brais|confit|kleftiko|foul|fasolakia|briam|ratatouille|caponata|imam|shakshuka|chakchouka|mapo|porc au caramel|thit kho|bœuf aux carottes|boeuf aux carottes|lathera/i],
+    ["four","Gratins & tartes","🧀",/gratin|clafoutis|parmentier|moussaka|quiche|tarte|tourte|souffl|tartiflette|flammekueche|pissaladi|aligot|parmigiana|endives|tian|r[oô]ti|en crapaudine|lasagnes v|fondue|raclette|fondant sal/i],
     ["salade","Salades & bowls","🥗",/salade|bowl|tabou|fattoush|caprese|ceviche|aguachile|tartare|carpaccio|tataki|gado|som tum|ni[cç]oise|panzanella|vitello|esquites|goma-ae/i],
     ["oeufs","Œufs","🍳",/(^|[^b])[oœ]uf|omelette|huevos|tamagoyaki|frittata|kuku|brouillade|tortilla de patatas|brik/i],
     ["galette","Galettes & farcis","🫓",/galette|cr[eê]pe|jianbing|man.ouch|b[aá]nh x[eè]o|farci|mahshi|chiles|dolma|fatteh|rouleaux|bharta/i],
@@ -30,7 +30,7 @@ const CK_GROUPS = {
     ["friture","Fritures & beignets","🍤",/nems?\b|samosa|beignet|bhaji|croquet|korokke|arancini|suppl[iì]|falafel|tempura|takoyaki|wu gok|pakora|fritto|ebi fry|tofu tod|chả giò|cigare|frites|patatas|batata|aloo tikki|kibbeh|wings|ailes/i],
     ["feuillete","Feuilletés & galettes","🥙",/b[öo]rek|chausson|empanada|tiropita|spanakopita|feuillet|galette|cr[eê]pe|pancake|okonomiyaki|jianbing|cong you|g[öo]zleme|man.ouch|fatayer|quesadilla|arepa|b[aá]nh x[eè]o|b[aá]nh kh[oọ]t|karipap|goug[eè]re|p[aã]o de queijo|naan|socca|pide|blini|kartoffelpuffer|gui cai|humitas|tamales/i],
     ["dip","Dips & tartinades","🥣",/houmous|hummus|baba|tzatziki|guacamole|\bdip\b|tapenade|tarama|labneh|muhammara|caviar|ktipiti|tirokafteri|skordalia|queso|melitzano|zaalouk|pico de gallo|salsa|trempette/i],
-    ["street","Street food & sandwichs","🌯",/croque|b[aá]nh m[iì]|nachos|tostada|taquito|arayes|sandwich|bruschetta|toast|elotes|yakitori|satay|brochette|tteokkochi|karaage|dakgangjeong|chicken|wings|saganaki|halloumi|pissaladi|focaccia|pizza|tacos|hot.?dog|yakisoba/i],
+    ["street","Street food & sandwichs","🌯",/crostini|croque|b[aá]nh m[iì]|nachos|tostada|taquito|arayes|sandwich|bruschetta|toast|elotes|yakitori|satay|brochette|tteokkochi|karaage|dakgangjeong|chicken|wings|saganaki|halloumi|pissaladi|focaccia|pizza|tacos|hot.?dog|yakisoba/i],
     ["froid","Rouleaux & bouchées froides","🍙",/rouleaux|tamagoyaki|onigiri|kimbap|gimmari|maki|sushi|ceviche|tartare|edamame|crackers|chips|pois chiches r[oô]tis|tofu|concombre/i],
     ["autre","Autres snacks","🥨"]]],
   sucre: ["Sucré","🍰","Sucré",[
@@ -110,10 +110,16 @@ const CK_FOOD = [ // couleur de la nourriture selon les mots-clés
  [/citron|lemon|limoncello/i,["#fff5b0","#e6c229"]],[/poisson|crevette|saumon|thon|fruits de mer|moules/i,["#ffd9c9","#e07a5f"]],[/fromage|cheese|gratin|alfredo|carbonara|cacio|b[eé]chamel|blanquette|cr[eè]me/i,["#fff3d6","#d9b26a"]],
  [/b[oœ]uf|bourguignon|steak|agneau|braise|daube|cassoulet/i,["#d9a58a","#7a3b28"]],[/poulet|volaille|yassa|coq/i,["#ffe0b2","#c67b3a"]],
 ];
+// Recettes compactes de chefskiss-data2.js -> même format que chefskiss-data.js
+function expandCK([id,n,ty,ca,cu,d,p,c,mr,m,ings,steps]){
+  const di={R:"Rapide/Facile",T:"Typique/Traditionnel",F:"Exceptionnel/Fête"}[d];
+  const i=ings.split("|").map(s=>s.trim()).filter(Boolean).map(s=>{ const k=s.indexOf("="); return [s.slice(0,k).trim(), s.slice(k+1).trim()]; });
+  return {id,n,ty,ca,cu,di,p,c,mr,m,op:/one.?pot/i.test(mr)?1:0,i,s:steps.split("|").map(s=>s.trim()).filter(Boolean)};
+}
 let CKD=null; // recettes décorées (emoji, couleurs, illustration)
 function ckData(){
   if(CKD) return CKD;
-  CKD = (window.CK||[]).map(r=>{
+  CKD = (window.CK||[]).concat((window.CK2||[]).map(expandCK)).map(r=>{
     const txt=r.n+" "+r.ca;
     const emo=(CK_EMO.find(([re])=>re.test(r.n))||[0,CK_TYPES[r.ty]?.icon||"🍽️"])[1];
     const food=(CK_FOOD.find(([re])=>re.test(r.n))||CK_FOOD.find(([re])=>re.test(r.i.map(x=>x[0]).join(" ")))||[0,null])[1] || (CK_CUISINES[r.cu]||CK_CUISINES.Autre).c;
@@ -245,7 +251,7 @@ function ckHome(){
     </section>
     <aside class="side ${state.side?"":"closed"}">
       <button class="handle" id="toggleSide" aria-label="Ça pourrait te plaire"><b>›</b>${state.side?"":'<span class="vlabel">Ça pourrait te plaire</span>'}</button>
-      <div class="list">${picks.map(p=>`<button class="mini" data-open="${p.id}"><span class="dot" style="background:${ckGrad(p)}">${p.emoji}</span>${esc(p.n.replace(/\s*\(.*\)/,""))}</button>`).join("")}</div>
+      <div class="list">${picks.map(p=>`<button class="mini" data-open="${p.id}"><span class="dot" style="background:${ckGrad(p)}">${ckImg(p,120)}${p.emoji}</span>${esc(p.n.replace(/\s*\(.*\)/,""))}</button>`).join("")}</div>
     </aside>
   </div>`;
 }
@@ -254,7 +260,7 @@ function ckHome(){
 function ckCard(r){
   const cu=CK_CUISINES[r.cu]||CK_CUISINES.Autre;
   return `<button class="card" data-open="${r.id}">
-    <div class="sw" style="background:${ckGrad(r)}">${r.emoji}<span class="tx">${cu.icon}</span></div>
+    <div class="sw" style="background:${ckGrad(r)}">${ckImg(r,330)}${r.emoji}<span class="tx">${cu.icon}</span></div>
     <h3>${favs.has(r.id)?"❤️ ":""}${esc(r.n.replace(/\s*\(.*\)/,""))}</h3>
     <div class="d">⏱ ${ckTime(r.t)} · ${CK_DIFF[r.di].icon} ${CK_DIFF[r.di].label}${r.op?" · 🫕":""}</div>
   </button>`;
@@ -291,12 +297,25 @@ function ckList(onlyFavs){
   ${list.length>lim?`<button class="btn" id="ckMore" style="width:100%;margin-top:14px">Voir plus (${list.length-lim} restantes)</button>`:""}`;
 }
 
+/* ---------- Photos (Wikipédia / Wikimedia Commons, licences libres) ---------- */
+// chefskiss-photos.js : window.CKP = {id: {i: vignette, f: fichier, a: auteur, l: licence, p: page source}}
+// tailles standard servies par Wikimedia : 120, 250, 330, 500, 960…
+// photos hébergées avec l'app (photos/), sinon vignette Wikimedia
+const ckPhoto = (r, w=500) => { const p=(window.CKP||{})[r.id]; return !p ? null : p.s ? p.s : p.i.split("?")[0].replace(/\/\d+px-/, `/${w}px-`); };
+const ckImg = (r, w) => { const u=ckPhoto(r,w); return u ? `<img class="ph" src="${u}" loading="lazy" alt="" onerror="this.remove()">` : ""; };
+function ckCredit(r){
+  const p=(window.CKP||{})[r.id]; if(!p) return "";
+  const file="https://commons.wikimedia.org/wiki/File:"+encodeURIComponent(p.f);
+  return `📷 ${p.a?esc(p.a)+" · ":""}${p.l?esc(p.l)+" · ":""}<a href="${file}" target="_blank" rel="noopener">Wikimedia Commons</a>`;
+}
+
 /* ---------- Page recette ---------- */
 function ckDetail(id){
-  const r=ckGet(id), inCourses=(state.ckPick||[]).includes(id);
+  const r=ckGet(id), inCourses=(state.ckPick||[]).includes(id), photo=ckPhoto(r,960);
   return `
+  ${photo?`<figure class="ckphoto"><img src="${photo}" alt="${esc(ckShort(r.n))}" onerror="this.parentNode.remove()"><figcaption>${ckCredit(r)}</figcaption></figure>`:""}
   <section class="dhero" style="--halo:${halo(r)}">
-    <div class="cupwrap platewrap">${plateSVG(r)}</div>
+    ${ckPhoto(r)?"":`<div class="cupwrap platewrap">${plateSVG(r)}</div>`}
     <div>
       <h1>${esc(r.n)}</h1>
       <p>${ckSubInfo(r)[2]} ${CK_GROUPS[r.grp][2]} · ${ckSubInfo(r)[1]}${r.vegan?" · 🌿 Vegan":r.veg?" · 🌱 Végétarien":""}</p>

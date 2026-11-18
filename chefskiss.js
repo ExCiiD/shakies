@@ -240,7 +240,7 @@ function ckHome(){
     <section class="stage" style="--halo:${halo(r)}">
       <div class="kicker">🎲 Le plat du moment · ${ckSubInfo(r)[1]}</div>
       ${ckPhoto(r)
-        ? `<button class="photowrap${enterNow?" enter":""}" id="cup" aria-label="Changer de plat"><span class="ph-fb" style="background:${ckGrad(r)}">${r.emoji}</span><img src="${ckPhoto(r)}" alt="${esc(ckShort(r.n))}" onerror="this.remove()"><span class="ph-credit">📷 ${esc(((window.CKP||{})[r.id]||{}).a||"Wikimedia Commons")}</span></button>`
+        ? `<button class="photowrap${enterNow?" enter":""}" id="cup" aria-label="Changer de plat"><span class="ph-fb" style="background:${ckGrad(r)}">${r.emoji}</span><img src="${ckPhoto(r)}" alt="${esc(ckShort(r.n))}" onerror="this.remove()"><span class="ph-credit">📷 ${((window.CKP||{})[r.id]||{}).g?"Photo d’illustration · ":""}${esc(((window.CKP||{})[r.id]||{}).a||"Wikimedia Commons")}</span></button>`
         : `<button class="cupwrap platewrap" id="cup" aria-label="Changer de plat">${plateSVG(r, enterNow)}</button>`}
       <h1>${r.emoji} ${esc(ckShort(r.n))}</h1>${ckSub(r.n)?`<div class="ksub">${esc(ckSub(r.n))}</div>`:""}
       <p>${CK_COOK[r.m]||"🍽️"} ${esc(r.mr)}${r.op?" · 🫕 One pot":""} · ${r.i.length} ingrédients</p>
@@ -310,7 +310,7 @@ const ckImg = (r, w) => { const u=ckPhoto(r,w); return u ? `<img class="ph" src=
 function ckCredit(r){
   const p=(window.CKP||{})[r.id]; if(!p) return "";
   const file="https://commons.wikimedia.org/wiki/File:"+encodeURIComponent(p.f);
-  return `📷 ${p.a?esc(p.a)+" · ":""}${p.l?esc(p.l)+" · ":""}<a href="${file}" target="_blank" rel="noopener">Wikimedia Commons</a>`;
+  return `📷 ${p.g?"Photo d’illustration (plat proche) · ":""}${p.a?esc(p.a)+" · ":""}${p.l?esc(p.l)+" · ":""}<a href="${file}" target="_blank" rel="noopener">Wikimedia Commons</a>`;
 }
 
 /* ---------- Page recette ---------- */

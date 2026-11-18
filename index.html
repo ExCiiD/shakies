@@ -774,7 +774,7 @@ const R = [
 /* ---------- utils ---------- */
 const $ = s => document.querySelector(s);
 const app = $("#app"), topEl = $("#top");
-const APP_VERSION = "2.3 · 18/11/2026"; // à changer à chaque publication : permet de vérifier que l'app est à jour
+const APP_VERSION = "2.4 · 18/11/2026"; // à changer à chaque publication : permet de vérifier que l'app est à jour
 const store = {
   get(k,d){ try{ return JSON.parse(localStorage.getItem(k)) ?? d }catch{ return d } },
   set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)) }catch{} }

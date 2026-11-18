@@ -328,6 +328,7 @@ body.u-chef .univ button.on{background:#e8590c;color:#fff}
 .seasonbtn{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px;font-size:.75rem;font-weight:700;margin-top:6px;color:var(--muted)}
 .seasonbtn.on{background:#2f9e44;border-color:#2f9e44;color:#fff}
 .seasonbtn small{font-weight:500;opacity:.85}
+.ver{text-align:center;font-size:.7rem;color:var(--muted);margin:22px 0 0;opacity:.8}
 .ksub{font-size:.85rem;color:var(--muted);font-style:italic;margin-top:2px}
 /* photos des plats */
 .card .sw,.mini .dot,.menu .dot,.prow .dot{position:relative;overflow:hidden}
@@ -765,6 +766,7 @@ const R = [
 /* ---------- utils ---------- */
 const $ = s => document.querySelector(s);
 const app = $("#app"), topEl = $("#top");
+const APP_VERSION = "2.2 · 18/11/2026"; // à changer à chaque publication : permet de vérifier que l'app est à jour
 const store = {
   get(k,d){ try{ return JSON.parse(localStorage.getItem(k)) ?? d }catch{ return d } },
   set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)) }catch{} }
@@ -1634,6 +1636,7 @@ function render(){
   else if(state.view==="favs") app.innerHTML = chef ? ckList(true) : viewList(true);
   else if(state.view==="shop") app.innerHTML = viewShop() + shopExportBar();
   else if(state.view==="create"){ app.innerHTML = viewCreate(); lastPrev=""; updateDraftUI(); }
+  if(["all","favs","shop"].includes(state.view)) app.insertAdjacentHTML("beforeend", `<p class="ver">Shakies &amp; Chef's Kiss · version ${APP_VERSION}</p>`);
   else app.innerHTML = isCK(state.id) ? ckDetail(state.id) : viewDetail(state.id);
   const ckr=$("#ckRange"); if(ckr) ckr.addEventListener("input", ()=>{ $("#ckVal").textContent=ckr.value; });
   const cps=$("#ckPickSearch");
@@ -1754,8 +1757,15 @@ window.addEventListener("devicemotion", e=>{
   if(f>38 && Date.now()-lastShake>1200){ lastShake=Date.now(); reroll(); }
 });
 
+// Mises à jour automatiques : on vérifie la nouvelle version au lancement et au retour dans l'app,
+// et on recharge une fois quand elle est installée.
 if("serviceWorker" in navigator && location.protocol.startsWith("http")){
-  navigator.serviceWorker.register("sw.js").catch(()=>{});
+  const hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register("sw.js", {updateViaCache:"none"}).then(reg=>{
+    document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState==="visible") reg.update().catch(()=>{}); });
+  }).catch(()=>{});
+  let reloaded=false;
+  navigator.serviceWorker.addEventListener("controllerchange", ()=>{ if(hadController && !reloaded){ reloaded=true; location.reload(); } });
 }
 render();
 </script>

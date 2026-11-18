@@ -59,6 +59,7 @@ function ckClassify(r){
   let grp;
   if(r.ty==="Dessert") grp="sucre";
   else if(r.ty==="Sauce") grp="sauce";
+  if(r.grpSel) grp=r.grpSel; // type choisi à la main (recette perso / modifiée)
   else if(r.ty==="Side") grp=CK_SWEET.test(title)?"sucre":"accomp";
   else if(r.ty==="Snack"||r.ty==="Breakfast") grp=CK_SWEET.test(title)?"sucre":(r.ty==="Snack"?"snack":"plat");
   else grp=CK_SWEET.test(title)&&!/poulet|porc|b[oœ]uf/i.test(title)?"sucre":"plat";
@@ -119,7 +120,8 @@ function expandCK([id,n,ty,ca,cu,d,p,c,mr,m,ings,steps]){
 let CKD=null; // recettes décorées (emoji, couleurs, illustration)
 function ckData(){
   if(CKD) return CKD;
-  CKD = (window.CK||[]).concat((window.CK2||[]).map(expandCK)).map(r=>{
+  const edits=store.get("ckedits",{}), customs=store.get("ckcustom",[]);
+  CKD = (window.CK||[]).concat((window.CK2||[]).map(expandCK)).map(r=>edits[r.id]?{...edits[r.id],edited:true}:r).concat(customs.map(r=>({...r,custom:true}))).map(r=>{
     const txt=r.n+" "+r.ca;
     const emo=(CK_EMO.find(([re])=>re.test(r.n))||[0,CK_TYPES[r.ty]?.icon||"🍽️"])[1];
     const food=(CK_FOOD.find(([re])=>re.test(r.n))||CK_FOOD.find(([re])=>re.test(r.i.map(x=>x[0]).join(" ")))||[0,null])[1] || (CK_CUISINES[r.cu]||CK_CUISINES.Autre).c;
@@ -285,6 +287,7 @@ function ckList(onlyFavs){
   const cuisines=Object.keys(CK_CUISINES).filter(c=>D.some(r=>r.cu===c));
   return `
   <div class="title"><h2>${onlyFavs?"Mes favoris":"Recettes"}</h2><span class="muted">${list.length} recette${list.length>1?"s":""}</span></div>
+  ${onlyFavs?"":`<div class="row2" style="margin:0 0 10px"><button class="btn" id="ckNew">＋ Créer</button><button class="btn alt2" id="impOpen">📥 Importer</button></div>`}
   <input id="search" class="search" type="search" placeholder="🔎 Un plat, un ingrédient… (ex : poulet, coco)" value="${esc(state.q)}">
   <div class="fpanel">
     <div class="frow"><div class="flabel">Type</div>${scrollRow(chip("grp","tous","Tous")+Object.entries(CK_GROUPS).map(([k,g])=>chip("grp",k,g[1]+" "+g[0])).join(""))}</div>
@@ -305,9 +308,10 @@ function ckList(onlyFavs){
 // photos hébergées avec l'app (photos/), sinon vignette Wikimedia
 // copie intégrée à l'APK (file://) : les photos ne sont pas embarquées, on les prend en ligne
 const PHOTO_BASE = location.protocol==="file:" ? "https://exciid.github.io/shakies/" : "";
-const ckPhoto = (r, w=500) => { const p=(window.CKP||{})[r.id]; return !p ? null : p.s ? PHOTO_BASE+p.s : p.i.split("?")[0].replace(/\/\d+px-/, `/${w}px-`); };
+const ckPhoto = (r, w=500) => { if(r.photo) return r.photo; const p=(window.CKP||{})[r.id]; return !p ? null : p.s ? PHOTO_BASE+p.s : p.i.split("?")[0].replace(/\/\d+px-/, `/${w}px-`); };
 const ckImg = (r, w) => { const u=ckPhoto(r,w); return u ? `<img class="ph" src="${u}" loading="lazy" alt="" onerror="this.remove()">` : ""; };
 function ckCredit(r){
+  if(r.photo) return "📷 Ta photo";
   const p=(window.CKP||{})[r.id]; if(!p) return "";
   const file="https://commons.wikimedia.org/wiki/File:"+encodeURIComponent(p.f);
   return `📷 ${p.g?"Photo d’illustration (plat proche) · ":""}${p.a?esc(p.a)+" · ":""}${p.l?esc(p.l)+" · ":""}<a href="${file}" target="_blank" rel="noopener">Wikimedia Commons</a>`;
@@ -325,7 +329,11 @@ function ckDetail(id){
       <p>${ckSubInfo(r)[2]} ${CK_GROUPS[r.grp][2]} · ${ckSubInfo(r)[1]}${r.vegan?" · 🌿 Vegan":r.veg?" · 🌱 Végétarien":""}</p>
       <div class="badges" style="justify-content:flex-start;margin:0">${ckBadges(r)}
         <button class="fav" id="fav">${favs.has(r.id)?"❤️ Favori":"🤍 Favori"}</button>
-        <button class="fav" data-ckadd="${r.id}">${inCourses?"🛒 Dans les courses ✓":"🛒 + Courses"}</button></div>
+        <button class="fav" data-ckadd="${r.id}">${inCourses?"🛒 Dans les courses ✓":"🛒 + Courses"}</button>
+        <button class="fav" data-ckedit="${r.id}">✏️ Modifier</button>
+        ${r.custom?`<button class="fav" data-ckdel="${r.id}">🗑️</button>`:""}
+        ${r.edited?`<button class="fav" data-ckrevert="${r.id}">↺ Recette d'origine</button>`:""}
+        ${r.src?`<a class="fav srclink" href="${esc(r.src)}" target="_blank" rel="noopener">🔗 Vidéo source</a>`:""}</div>
     </div>
   </section>
   <div class="panel">
@@ -515,3 +523,222 @@ function pickDishes(fixed, extra){
   }
   return plan;
 }
+
+/* ---------- Créer / modifier une recette Chef's Kiss ---------- */
+const GRP_TY = {plat:"Meal", snack:"Snack", sucre:"Dessert", accomp:"Side", sauce:"Sauce"};
+const GRP_CA = {plat:"Copieux", snack:"Fast Food", sucre:"Pâtisserie", accomp:"Healthy", sauce:"Healthy"};
+const COOK_MODES = ["Four","Poêle & gril","Wok","Casserole","Mijoté","Vapeur","Friture","Sans cuisson","Mixeur"];
+function ckNewDraft(){ return {n:"", grp:"plat", cu:"Français", di:"Rapide/Facile", p:15, c:20, m:"Poêle & gril", mr:"", op:false,
+  i:[{item:"",q:""},{item:"",q:""},{item:"",q:""}], s:[""], src:"", photo:""}; }
+function ckEditRecipe(id){
+  const r=ckGet(id);
+  state.ckdraft={id, n:r.n, grp:r.grp, cu:r.cu, di:r.di, p:r.p, c:r.cook, m:r.m, mr:r.mr, op:!!r.op,
+    i:r.i.map(([item,q])=>({item,q})), s:[...r.s], src:r.src||"", photo:r.photo||"", builtin:!r.custom};
+  state.from="all"; go("ckedit");
+}
+function ckEditorView(){
+  const d=state.ckdraft, opt=(v,cur,lab)=>`<option value="${esc(v)}" ${v===cur?"selected":""}>${lab||v}</option>`;
+  return `
+  <div class="title"><h2>${d.id?"Modifier la recette":"Nouvelle recette"}</h2></div>
+  ${d.builtin?`<p class="muted" style="font-size:.8rem;margin:0 0 10px">C'est une recette d'origine : tes changements sont enregistrés à part, tu pourras revenir à la version d'origine.</p>`:""}
+  ${d.warn?`<div class="warn" style="margin-bottom:10px">${d.warn}</div>`:""}
+  <div class="panel" style="margin-top:0">
+    <label class="fl">Nom du plat<input data-ck="n" value="${esc(d.n)}" maxlength="80" placeholder="ex : Curry de pois chiches"></label>
+    <div class="grid2">
+      <label class="fl">Type<select class="tsel" data-ck="grp">${Object.entries(CK_GROUPS).map(([k,g])=>opt(k,d.grp,g[1]+" "+g[0])).join("")}</select></label>
+      <label class="fl">Cuisine<select class="tsel" data-ck="cu">${Object.keys(CK_CUISINES).map(c=>opt(c,d.cu,CK_CUISINES[c].icon+" "+c)).join("")}</select></label>
+      <label class="fl">Difficulté<select class="tsel" data-ck="di">${Object.entries(CK_DIFF).map(([k,v])=>opt(k,d.di,v.icon+" "+v.label)).join("")}</select></label>
+      <label class="fl">Cuisson<select class="tsel" data-ck="m">${COOK_MODES.map(m=>opt(m,d.m,(CK_COOK[m]||"")+" "+m)).join("")}</select></label>
+      <label class="fl">Préparation (min)<input data-ck="p" type="number" inputmode="numeric" min="0" value="${d.p}"></label>
+      <label class="fl">Cuisson (min)<input data-ck="c" type="number" inputmode="numeric" min="0" value="${d.c}"></label>
+    </div>
+    <label class="fl">Précision sur la cuisson <span class="muted">(facultatif)</span><input data-ck="mr" value="${esc(d.mr)}" placeholder="ex : Four 180 °C, Cocotte, One pot…"></label>
+  </div>
+  <div class="panel">
+    <h3>Ingrédients</h3>
+    ${d.i.map((x,k)=>`<div class="irow ck"><input data-ckrow="${k}" data-k="q" value="${esc(x.q)}" placeholder="200 g"><input data-ckrow="${k}" data-k="item" value="${esc(x.item)}" placeholder="ex : pois chiches"><button data-ckdelrow="${k}" aria-label="Retirer">✕</button></div>`).join("")}
+    <button class="pchip add" id="ckAddRow">＋ Ajouter un ingrédient</button>
+  </div>
+  <div class="panel">
+    <h3>Étapes</h3>
+    ${d.s.map((x,k)=>`<div class="srow"><span class="num">${k+1}</span><textarea data-ckstep="${k}" rows="2" placeholder="Décris l'étape…">${esc(x)}</textarea><button data-ckdelstep="${k}" aria-label="Retirer">✕</button></div>`).join("")}
+    <button class="pchip add" id="ckAddStep">＋ Ajouter une étape</button>
+  </div>
+  <div class="panel">
+    <h3>Photo <span class="muted" style="font:500 .75rem Inter">facultatif</span></h3>
+    ${d.photo?`<img src="${d.photo}" alt="" style="width:100%;border-radius:16px;max-height:220px;object-fit:cover"><button class="pchip" id="ckDelPhoto" style="margin-top:6px">✕ Retirer la photo</button>`:""}
+    <label class="pchip add" style="display:inline-block;margin-top:6px">📷 ${d.photo?"Changer":"Ajouter"} une photo<input type="file" accept="image/*" id="ckPhotoIn" hidden></label>
+    <label class="fl">Lien de la vidéo <span class="muted">(facultatif)</span><input data-ck="src" value="${esc(d.src)}" placeholder="https://…"></label>
+  </div>
+  <div class="err" id="ckErr"></div>
+  <button class="btn" id="ckSave" style="width:100%;margin-top:12px">💾 Enregistrer</button>`;
+}
+function ckFam(m){ return COOK_MODES.includes(m)?m:"Autre"; }
+function ckSaveDraft(){
+  const d=state.ckdraft, err=$("#ckErr"), cl=s=>String(s||"").replace(/[<>"&]/g,"").trim();
+  if(!cl(d.n)) return err.textContent="Donne un nom au plat.";
+  const i=d.i.filter(x=>cl(x.item)).map(x=>[cl(x.item), cl(x.q)||"au goût"]);
+  if(i.length<1) return err.textContent="Ajoute au moins un ingrédient.";
+  const s=d.s.map(cl).filter(Boolean);
+  const raw={id:d.id||"ckperso-"+Date.now().toString(36), n:cl(d.n), ty:GRP_TY[d.grp], ca:GRP_CA[d.grp], grpSel:d.grp, cu:d.cu, di:d.di,
+    p:+d.p||0, c:+d.c||0, mr:cl(d.mr)||d.m, m:ckFam(d.m), op:/one.?pot/i.test(d.mr)?1:0, i, s:s.length?s:["Voir la vidéo ou ajoute les étapes."],
+    src:cl(d.src)||undefined, photo:d.photo||undefined};
+  try{
+    if(d.builtin){ const e=store.get("ckedits",{}); e[raw.id]=raw; localStorage.setItem("ckedits",JSON.stringify(e)); }
+    else { const c=store.get("ckcustom",[]); const k=c.findIndex(x=>x.id===raw.id); if(k>=0) c[k]=raw; else c.push(raw); localStorage.setItem("ckcustom",JSON.stringify(c)); }
+  }catch(e){ return err.textContent="Mémoire du téléphone pleine : essaie avec une photo plus petite ou sans photo."; }
+  CKD=null; state.ckdraft=null; state.view="all"; open(raw.id);
+}
+function ckDeleteRecipe(id){
+  const r=ckGet(id); if(!confirm(`Supprimer « ${r.n} » ? Cette action est définitive.`)) return;
+  store.set("ckcustom", store.get("ckcustom",[]).filter(x=>x.id!==id)); favs.delete(id); store.set("favs",[...favs]);
+  state.ckPick=(state.ckPick||[]).filter(x=>x!==id); store.set("ckpick",state.ckPick);
+  if(state.ckRandom===id) state.ckRandom=null; CKD=null; go("all");
+}
+function ckRevert(id){ const e=store.get("ckedits",{}); delete e[id]; store.set("ckedits",e); CKD=null; render(); }
+// photo choisie dans la galerie : réduite à 800 px pour tenir dans la mémoire de l'app
+function ckLoadPhoto(file){
+  const img=new Image(), url=URL.createObjectURL(file);
+  img.onload=()=>{ const k=Math.min(1,800/Math.max(img.width,img.height)), c=document.createElement("canvas");
+    c.width=Math.round(img.width*k); c.height=Math.round(img.height*k); c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+    state.ckdraft.photo=c.toDataURL("image/jpeg",.72); URL.revokeObjectURL(url); const y=scrollY; render(); scrollTo(0,y); };
+  img.src=url;
+}
+
+/* ---------- Importer une recette depuis TikTok / Instagram / Facebook / YouTube ---------- */
+function platformOf(url){
+  if(/tiktok\.com/i.test(url)) return "TikTok"; if(/instagram\.com/i.test(url)) return "Instagram";
+  if(/facebook\.com|fb\.watch/i.test(url)) return "Facebook"; if(/youtube\.com|youtu\.be/i.test(url)) return "YouTube";
+  return null;
+}
+const decodeHtml = s => { const t=document.createElement("textarea"); t.innerHTML=s; return t.value; };
+const hasNativeFetch = () => !!(window.Android && typeof window.Android.fetchUrl === "function");
+function nativeFetch(url){
+  return new Promise(res=>{ const cb="__nf"+Date.now(); let done=false;
+    window[cb]=html=>{ if(done) return; done=true; delete window[cb]; res(html); };
+    try{ window.Android.fetchUrl(url, cb); }catch(e){ res(null); }
+    setTimeout(()=>{ if(!done){ done=true; res(null); } },20000); });
+}
+// description depuis le HTML d'une page (lu par l'app Android, sans les blocages du navigateur)
+function descFromHtml(html, platform){
+  if(!html) return null;
+  const meta = n => { const m=html.match(new RegExp(`<meta[^>]+(?:property|name)=["']${n}["'][^>]*content=["']([^"']*)["']`,"i"))||html.match(new RegExp(`<meta[^>]+content=["']([^"']*)["'][^>]*(?:property|name)=["']${n}["']`,"i")); return m?decodeHtml(m[1]):""; };
+  let text="", title=meta("og:title")||meta("title");
+  if(platform==="YouTube"){ const m=html.match(/"shortDescription":"((?:\\.|[^"\\])*)"/); if(m) try{ text=JSON.parse('"'+m[1]+'"'); }catch(e){} }
+  if(platform==="TikTok"){ const m=html.match(/"desc":"((?:\\.|[^"\\])*)"/); if(m) try{ text=JSON.parse('"'+m[1]+'"'); }catch(e){} }
+  if(!text) text=meta("og:description")||meta("description");
+  if(platform==="Instagram"){ const q=text.match(/:\s*["“](.*)["”]\s*\.?$/s); if(q) text=q[1]; }
+  return {title, text};
+}
+async function readLink(url){
+  const platform=platformOf(url);
+  if(!platform) return {error:"Ce lien ne vient pas de TikTok, Instagram, Facebook ou YouTube."};
+  let title="", text="", partial=false;
+  if(platform==="TikTok"){
+    try{ const j=await fetch("https://www.tiktok.com/oembed?url="+encodeURIComponent(url)).then(r=>r.json()); text=j.title||""; title=j.author_name?("Recette de "+j.author_name):""; }catch(e){}
+  }
+  if((!text || platform!=="TikTok") && hasNativeFetch()){
+    const r=descFromHtml(await nativeFetch(url), platform); if(r){ text=r.text||text; title=r.title||title; }
+  }
+  if(!text && platform==="YouTube"){
+    try{ const j=await fetch("https://www.youtube.com/oembed?format=json&url="+encodeURIComponent(url)).then(r=>r.json()); title=j.title||""; partial=true; }catch(e){}
+  }
+  return {platform, title, text, partial};
+}
+// analyse d'une description : titre, ingrédients, étapes
+const QTY_RE = /^((?:\d+[.,/]?\d*|[½¼¾⅓⅔])(?:\s*(?:à|-|–)\s*\d+[.,]?\d*)?)\s*(kg|g|gr|grammes?|mg|l|cl|ml|dl|c\.?\s?à\s?s\.?|c\.?\s?à\s?c\.?|càs|cas|càc|cac|cs|cc|cuill[eè]res?(?: à (?:soupe|café))?|tbsp|tsp|tablespoons?|teaspoons?|cups?|tasses?|verres?|oz|lbs?|pinc[eé]es?|pinch|gousses?|cloves?|tranches?|slices?|bottes?|poign[eé]es?|sachets?|bo[iî]tes?|cans?|pi[eè]ces?|feuilles?)?\.?\s+(?:de\s+|d['’]\s*|of\s+)?(.+)$/i;
+function cleanLine(s){ return s.replace(/^[\s\-–—•·*▪◾◽▫️✅✔☑️➡️👉🔸🔹⭐️🌟✨💛❤️🧡💚💙💜🖤🤍🥄🍴🔥📌📍👇]+/u,"").replace(/#[\p{L}\d_]+/gu,"").replace(/\s+/g," ").trim(); }
+function parseRecipeText(raw, fallbackTitle){
+  let lines=String(raw||"").split(/\r?\n|(?<=[.!?])\s+(?=\d+[.)]\s)/).map(s=>s.trim()).filter(Boolean);
+  // listes écrites sur une ligne : « 1 cup mango, 1 banana, 1/2 cup oat milk »
+  lines=lines.flatMap(l=>{
+    if((l.match(/[,;]\s*(?:\d|[½¼¾])/g)||[]).length<2) return [l];
+    const parts=l.split(/[,;]\s*(?=\d|[½¼¾])/), first=parts[0], k=first.search(/(?:^|\s)(?:\d+[.,/]?\d*|[½¼¾])\s*[a-zéèà.]*\s+\S/i);
+    return (k>0 ? [first.slice(0,k).trim(), first.slice(k).trim()] : [first]).concat(parts.slice(1)).map(s=>s.trim()).filter(Boolean);
+  });
+  const ingHead=/^(ingr[ée]dients?|ingredients|what you('|’)ll need|you('|’)ll need|liste|pour \d+ (?:personnes|pers)|for \d+|serves \d+)\b/i;
+  const stepHead=/^(pr[ée]paration|[ée]tapes?|instructions?|m[ée]thode|method|directions?|steps?|how to|recette|d[ée]roul[ée])\b/i;
+  let mode=null; const ing=[], steps=[], other=[];
+  for(const l0 of lines){
+    const l=cleanLine(l0); if(!l) continue;
+    if(ingHead.test(l)){ mode="ing"; const rest=l.replace(ingHead,"").replace(/\([^)]*\)/g,"").replace(/^[\s:–-]+|[\s:]+$/g,""); if(rest.length>2) ing.push(rest); continue; }
+    if(stepHead.test(l) && l.length<40){ mode="step"; continue; }
+    const numStep=/^\d+\s*[.)/-]\s+\S/.test(l0.trim()) && l.length>25;
+    const looksIng=QTY_RE.test(l) && l.length<70;
+    if(mode==="ing" && !numStep && l.length<90) ing.push(l);
+    else if(mode==="step" || numStep) steps.push(l.replace(/^\d+\s*[.)/-]\s*/,""));
+    else if(looksIng) ing.push(l);
+    else other.push(l);
+  }
+  const title = (fallbackTitle && fallbackTitle.length<70 ? fallbackTitle : "") || (other[0]||"").replace(/[.!?].*$/,"").slice(0,60) || "Recette importée";
+  const cut = s => s.split(/[.!?](?:\s|$)/)[0].trim(); // « 1 tbsp honey. Blend and enjoy » -> « honey »
+  const parsed = ing.map(l=>{ const m=l.match(QTY_RE); return m ? {q:m[1]+(m[2]?" "+m[2]:""), item:cut(m[3]), qn:m[1], u:m[2]||""} : {q:"", item:cut(l), qn:"", u:""}; }).filter(x=>x.item);
+  return {title:cleanLine(title), ing:parsed, steps, found: parsed.length>=2};
+}
+// conversion vers une recette Shakies
+function toShakieUnit(qn,u){
+  const s=String(qn).replace(",",".").replace("½","0.5").replace("¼","0.25").replace("¾","0.75").replace("⅓","0.33").replace("⅔","0.66");
+  const fr=s.match(/^(\d+)\s*\/\s*(\d+)$/); let q=fr ? (+fr[1])/(+fr[2]) : (parseFloat(s)||1); u=(u||"").toLowerCase();
+  if(/^(g|gr|gramm)/.test(u)) return [q,"g"]; if(u==="kg") return [q*1000,"g"]; if(u==="ml") return [q,"ml"]; if(u==="cl") return [q*10,"ml"]; if(u==="l") return [q*1000,"ml"];
+  if(/cups?|tasses?/.test(u)) return [q*240,"ml"]; if(/verres?/.test(u)) return [q*200,"ml"]; if(/oz/.test(u)) return [q*28,"g"];
+  if(/s\b|soupe|tbsp|tablespoon|cs|càs|cas/.test(u)) return [q,"c. à s."]; if(/c\b|café|tsp|teaspoon|cc|càc|cac/.test(u)) return [q,"c. à c."];
+  if(/pinc|pinch/.test(u)) return [q,"pincée"]; if(/feuille/.test(u)) return [q,"feuilles"];
+  return [q,""];
+}
+function viewImport(){
+  const im=state.imp||(state.imp={url:"",text:"",target:state.univers==="chef"?"chef":"shakies",msg:"",busy:false});
+  return `
+  <div class="title"><h2>Importer une recette</h2></div>
+  <div class="panel" style="margin-top:0">
+    <p class="muted" style="font-size:.82rem;margin:0 0 8px">Colle le lien d'un reel ou d'un short <b>TikTok, Instagram, Facebook ou YouTube</b> : je lis la description et je prépare la recette.</p>
+    <label class="fl">Lien de la vidéo<input id="impUrl" type="url" inputmode="url" value="${esc(im.url)}" placeholder="https://www.tiktok.com/@…/video/…"></label>
+    <button class="btn" id="impRead" style="width:100%" ${im.busy?"disabled":""}>${im.busy?"⏳ Lecture…":"🔎 Lire la description"}</button>
+    ${im.msg?`<div class="warn" style="margin-top:10px">${im.msg}</div>`:""}
+    <label class="fl" style="margin-top:12px">Description <span class="muted">(remplie automatiquement, ou colle-la ici)</span>
+      <textarea id="impText" rows="7" placeholder="Copie la description sous la vidéo et colle-la ici…">${esc(im.text)}</textarea></label>
+    <div class="size" style="margin:8px 0"><button data-imptarget="shakies" class="${im.target==="shakies"?"on":""}">🥤 C'est un shakie</button><button data-imptarget="chef" class="${im.target==="chef"?"on":""}">🍽️ C'est un plat</button></div>
+    <button class="btn" id="impGo" style="width:100%">✨ Créer la recette</button>
+  </div>
+  <p class="muted" style="font-size:.74rem">${hasNativeFetch()
+    ? "L'app lit toute seule la description des vidéos <b>TikTok</b> et <b>YouTube</b>. Instagram et Facebook cachent la description aux applis : copie-la sous la vidéo et colle-la ici."
+    : "Depuis le navigateur, les plateformes bloquent la lecture : copie la description sous la vidéo et colle-la ici. L'app Android 3.0 lit toute seule TikTok et YouTube."}
+    Astuce${hasNativeFetch()?"":" (app Android)"} : dans TikTok, Instagram ou YouTube, touche « Partager » puis Shakies.</p>`;
+}
+async function impRead(){
+  const im=state.imp; im.url=($("#impUrl")?.value||"").trim(); im.text=$("#impText")?.value||im.text;
+  if(!im.url){ im.msg="Colle d'abord le lien de la vidéo."; return render(); }
+  im.busy=true; im.msg=""; render();
+  const r=await readLink(im.url); im.busy=false;
+  if(r.error){ im.msg=r.error; return render(); }
+  im.platform=r.platform; im.title=r.title;
+  if(r.text){ im.text=r.text; const p=parseRecipeText(r.text, r.title);
+    im.msg = p.found ? `✅ Description lue : ${p.ing.length} ingrédients${p.steps.length?` et ${p.steps.length} étapes`:""} trouvés. Vérifie, puis « Créer la recette ».`
+      : `⚠️ <b>Il n'y a pas de recette dans la description</b> de cette vidéo. Tu vas devoir ajouter les ingrédients et les étapes <b>à la main</b> : touche « Créer la recette », le nom et le lien seront déjà remplis.`;
+  } else im.msg = r.partial ? `⚠️ ${r.platform} ne laisse lire que le titre depuis ici (« ${esc(r.title)} »). Ouvre la vidéo, copie la description et colle-la ci-dessous.`
+      : /Instagram|Facebook/.test(r.platform) ? `⚠️ ${r.platform} ne laisse pas les applis lire la description. Ouvre la vidéo, copie la description et colle-la ci-dessous.`
+      : `⚠️ Impossible de lire la description sur ${r.platform}${hasNativeFetch()?" (vidéo privée ou supprimée ?)":" depuis le navigateur"}. Copie la description sous la vidéo et colle-la ci-dessous.`;
+  render();
+}
+function impGo(){
+  const im=state.imp; im.text=$("#impText")?.value||""; im.url=($("#impUrl")?.value||im.url).trim();
+  const p=parseRecipeText(im.text, im.title||"");
+  const warn = p.found ? "" : "⚠️ Pas de recette dans la description : ajoute les ingrédients et les étapes à la main.";
+  if(!p.found && !confirm("Il n'y a pas de recette dans la description.\nTu vas devoir ajouter la recette manuellement. Continuer ?")) return;
+  const title=p.title||"Recette importée";
+  if(im.target==="shakies"){
+    const d=newDraft(); d.nom=title.slice(0,40); d.src=im.url; d.desc=im.platform?`Recette trouvée sur ${im.platform}.`:"";
+    if(p.found) d.ing=p.ing.map(x=>{ const [q,u]=toShakieUnit(x.qn,x.u); return {q,u,n:x.item}; });
+    state.draft=d; state.univers="shakies"; store.set("univers","shakies"); state.from="all"; state.imp=null; go("create");
+    if(warn){ const e=$("#formErr"); if(e) e.textContent=warn; }
+  } else {
+    const d=ckNewDraft(); d.n=title; d.src=im.url;
+    if(p.found){ d.i=p.ing.map(x=>({item:x.item,q:x.q})); if(p.steps.length) d.s=p.steps; }
+    d.warn=warn; state.ckdraft=d; state.univers="chef"; store.set("univers","chef"); state.from="all"; state.imp=null; go("ckedit");
+  }
+}
+// texte partagé vers l'app depuis TikTok / Instagram / YouTube (APK) : on ouvre l'import
+window.onSharedText = txt => {
+  const url=(String(txt).match(/https?:\/\/\S+/)||[""])[0];
+  state.imp={url, text:"", target:state.univers==="chef"?"chef":"shakies", msg:"", busy:false}; go("import");
+  if(url) impRead();
+};

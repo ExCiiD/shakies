@@ -65,10 +65,38 @@ public class MainActivity extends Activity {
                 // pas de réseau et rien en cache : on bascule sur la version embarquée
                 if (req.isForMainFrame() && !usingLocal) { usingLocal = true; view.loadUrl(LOCAL); }
             }
+            @Override
+            public void onPageFinished(WebView view, String url) { deliverShared(); }
         });
         setContentView(web);
+        pendingShared = sharedText(getIntent());
         if (savedInstanceState != null) web.restoreState(savedInstanceState);
         else web.loadUrl(REMOTE);
+    }
+
+    /* ---- Partager une vidéo (TikTok, Instagram, YouTube…) vers Shakies : on ouvre l'import ---- */
+    private String pendingShared = null;
+    private boolean pageReady = false;
+
+    private static String sharedText(Intent i) {
+        if (i == null || !Intent.ACTION_SEND.equals(i.getAction())) return null;
+        String t = i.getStringExtra(Intent.EXTRA_TEXT);
+        return (t == null || t.trim().isEmpty()) ? null : t;
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        String t = sharedText(intent);
+        if (t != null) { pendingShared = t; if (pageReady) deliverShared(); }
+    }
+
+    private void deliverShared() {
+        pageReady = true;
+        if (pendingShared == null) return;
+        final String js = "window.onSharedText && window.onSharedText(" + org.json.JSONObject.quote(pendingShared) + ")";
+        pendingShared = null;
+        web.postDelayed(new Runnable() { @Override public void run() { web.evaluateJavascript(js, null); } }, 600);
     }
 
     @Override
@@ -120,6 +148,36 @@ public class MainActivity extends Activity {
                     startActivity(Intent.createChooser(textIntent(text), "Partager la liste"));
                 }
             }});
+        }
+
+        /** Lit une page web (description d'un reel / short) sans les blocages du navigateur, puis appelle cb(html). */
+        @JavascriptInterface
+        public void fetchUrl(final String url, final String cb) {
+            if (url == null || !url.matches("^https://[^\\s]+$") || cb == null || !cb.matches("^[A-Za-z0-9_]+$")) return;
+            new Thread(new Runnable() { @Override public void run() {
+                String html = "";
+                try {
+                    java.net.URL u = new java.net.URL(url);
+                    java.net.HttpURLConnection c = null;
+                    for (int hop = 0; hop < 5; hop++) {          // suit les redirections (vm.tiktok.com, youtu.be…)
+                        c = (java.net.HttpURLConnection) u.openConnection();
+                        c.setInstanceFollowRedirects(false);
+                        c.setConnectTimeout(12000); c.setReadTimeout(15000);
+                        c.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Mobile Safari/537.36");
+                        c.setRequestProperty("Accept-Language", "fr-FR,fr;q=0.9,en;q=0.8");
+                        int code = c.getResponseCode();
+                        if (code >= 300 && code < 400 && c.getHeaderField("Location") != null) { u = new java.net.URL(u, c.getHeaderField("Location")); c.disconnect(); continue; }
+                        break;
+                    }
+                    java.io.InputStream in = c.getInputStream();
+                    java.io.ByteArrayOutputStream bo = new java.io.ByteArrayOutputStream();
+                    byte[] buf = new byte[16384]; int n, total = 0;
+                    while ((n = in.read(buf)) > 0 && total < 4000000) { bo.write(buf, 0, n); total += n; }
+                    in.close(); html = new String(bo.toByteArray(), StandardCharsets.UTF_8);
+                } catch (Exception e) { html = ""; }
+                final String js = cb + "(" + org.json.JSONObject.quote(html) + ")";
+                runOnUiThread(new Runnable() { @Override public void run() { web.evaluateJavascript(js, null); } });
+            }}).start();
         }
 
         @JavascriptInterface

@@ -1,5 +1,5 @@
 // Service worker : toujours la dernière version en ligne, et l'app marche hors-ligne une fois ouverte une première fois.
-const CACHE = "shakies-v15";
+const CACHE = "shakies-v16";
 const ASSETS = ["./", "./index.html", "./chefskiss.js", "./chefskiss-data.js", "./chefskiss-photos.js", "./shakies-data2.js", "./chefskiss-data2.js", "./manifest.webmanifest", "./icon.svg"];
 
 self.addEventListener("install", e => {
@@ -13,6 +13,7 @@ self.addEventListener("activate", e => {
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET") return;
   const url = new URL(e.request.url);
+  if (url.origin !== self.location.origin) return; // requêtes vers d'autres sites (import TikTok…, polices) : non interceptées
   const appFile = url.origin === self.location.origin && !url.pathname.includes("/photos/");
   const req = appFile ? new Request(e.request, {cache: "no-cache"}) : e.request;
   e.respondWith(

@@ -1,5 +1,5 @@
 // Service worker : toujours la dernière version en ligne, et l'app marche hors-ligne une fois ouverte une première fois.
-const CACHE = "shakies-v13";
+const CACHE = "shakies-v14";
 const ASSETS = ["./", "./index.html", "./chefskiss.js", "./chefskiss-data.js", "./chefskiss-photos.js", "./shakies-data2.js", "./chefskiss-data2.js", "./manifest.webmanifest", "./icon.svg"];
 
 self.addEventListener("install", e => {

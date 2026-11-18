@@ -239,7 +239,9 @@ function ckHome(){
   return `<div class="home">
     <section class="stage" style="--halo:${halo(r)}">
       <div class="kicker">🎲 Le plat du moment · ${ckSubInfo(r)[1]}</div>
-      <button class="cupwrap platewrap" id="cup" aria-label="Changer de plat">${plateSVG(r, enterNow)}</button>
+      ${ckPhoto(r)
+        ? `<button class="photowrap${enterNow?" enter":""}" id="cup" aria-label="Changer de plat"><span class="ph-fb" style="background:${ckGrad(r)}">${r.emoji}</span><img src="${ckPhoto(r)}" alt="${esc(ckShort(r.n))}" onerror="this.remove()"><span class="ph-credit">📷 ${esc(((window.CKP||{})[r.id]||{}).a||"Wikimedia Commons")}</span></button>`
+        : `<button class="cupwrap platewrap" id="cup" aria-label="Changer de plat">${plateSVG(r, enterNow)}</button>`}
       <h1>${r.emoji} ${esc(ckShort(r.n))}</h1>${ckSub(r.n)?`<div class="ksub">${esc(ckSub(r.n))}</div>`:""}
       <p>${CK_COOK[r.m]||"🍽️"} ${esc(r.mr)}${r.op?" · 🫕 One pot":""} · ${r.i.length} ingrédients</p>
       <div class="badges">${ckBadges(r)}</div>
@@ -301,7 +303,9 @@ function ckList(onlyFavs){
 // chefskiss-photos.js : window.CKP = {id: {i: vignette, f: fichier, a: auteur, l: licence, p: page source}}
 // tailles standard servies par Wikimedia : 120, 250, 330, 500, 960…
 // photos hébergées avec l'app (photos/), sinon vignette Wikimedia
-const ckPhoto = (r, w=500) => { const p=(window.CKP||{})[r.id]; return !p ? null : p.s ? p.s : p.i.split("?")[0].replace(/\/\d+px-/, `/${w}px-`); };
+// copie intégrée à l'APK (file://) : les photos ne sont pas embarquées, on les prend en ligne
+const PHOTO_BASE = location.protocol==="file:" ? "https://exciid.github.io/shakies/" : "";
+const ckPhoto = (r, w=500) => { const p=(window.CKP||{})[r.id]; return !p ? null : p.s ? PHOTO_BASE+p.s : p.i.split("?")[0].replace(/\/\d+px-/, `/${w}px-`); };
 const ckImg = (r, w) => { const u=ckPhoto(r,w); return u ? `<img class="ph" src="${u}" loading="lazy" alt="" onerror="this.remove()">` : ""; };
 function ckCredit(r){
   const p=(window.CKP||{})[r.id]; if(!p) return "";
